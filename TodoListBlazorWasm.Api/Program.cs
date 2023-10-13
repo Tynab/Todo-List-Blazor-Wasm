@@ -3,6 +3,7 @@ using Microsoft.Extensions.Options;
 using TodoListBlazorWasm.Api.Data;
 using TodoListBlazorWasm.Api.Extensions;
 using TodoListBlazorWasm.Api.Options;
+using TodoListBlazorWasm.Api.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,6 +17,7 @@ builder.Services.AddDbContext<TodoListDbContext>((p, o) =>
 });
 
 builder.Services.AddControllers();
+builder.Services.AddTransient<ITaskRepository, TaskRepository>();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
