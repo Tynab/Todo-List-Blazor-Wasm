@@ -1,6 +1,9 @@
 ﻿using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Polly;
+using static Polly.Policy;
+using static System.Math;
+using static System.TimeSpan;
 
 namespace TodoListBlazorWasm.Api.Extensions;
 
@@ -12,20 +15,18 @@ public static class HostExtension
         {
             var service = scope.ServiceProvider;
             var logger = service.GetRequiredService<ILogger<TContext>>();
-            var context = service.GetService<TContext>();
 
             try
             {
                 logger.LogInformation("Migrating database associated with context {DbContextName}", typeof(TContext).Name);
 
                 var retries = 10;
-                var retry = Policy.Handle<SqlException>().WaitAndRetry(
-                    retryCount: retries,
-                    sleepDurationProvider: r => TimeSpan.FromSeconds(Math.Pow(2, r)),
-                    onRetry: (e, t, r, c) => logger.LogWarning(e, "[{Prefix}] Exception {ExceptionType} with message {Message} detected on attempt {Retry} of {Retries}", nameof(TContext), e.GetType().Name, e.Message, r, retries)
-                );
 
-                retry.Execute(() => InvokeSeeder(seeder!, context, service));
+                Handle<SqlException>().WaitAndRetry(
+                    retryCount: retries,
+                    sleepDurationProvider: r => FromSeconds(Pow(2, r)),
+                    onRetry: (e, t, r, c) => logger.LogWarning(e, "[{Prefix}] Exception {ExceptionType} with message {Message} detected on attempt {Retry} of {Retries}", nameof(TContext), e.GetType().Name, e.Message, r, retries)
+                ).Execute(() => InvokeSeeder(seeder!, service.GetService<TContext>(), service));
                 logger.LogInformation("Migrated database associated with context {DbContext}", typeof(TContext).Name);
             }
             catch (Exception ex)
