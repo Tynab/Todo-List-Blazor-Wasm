@@ -6,7 +6,7 @@ public interface ITaskRepository
 
     public ValueTask<Entities.Task?> Get(Guid id);
 
-    public ValueTask<Entities.Task?> Insert(Entities.Task task);
+    public ValueTask<Entities.Task?> Create(Entities.Task task);
 
     public ValueTask<Entities.Task?> Update(Entities.Task task);
 

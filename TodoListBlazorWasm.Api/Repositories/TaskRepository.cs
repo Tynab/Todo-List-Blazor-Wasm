@@ -13,7 +13,7 @@ public class TaskRepository : ITaskRepository
 
     public async ValueTask<Entities.Task?> Get(Guid id) => await _dbContext.Tasks.Include(x => x.Assignee).AsNoTracking().FirstOrDefaultAsync(x => x.Id == id);
 
-    public async ValueTask<Entities.Task?> Insert(Entities.Task task)
+    public async ValueTask<Entities.Task?> Create(Entities.Task task)
     {
         var ent = await _dbContext.Tasks.AddAsync(task);
 

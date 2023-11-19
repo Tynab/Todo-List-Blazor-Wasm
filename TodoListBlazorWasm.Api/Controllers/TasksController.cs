@@ -54,7 +54,7 @@ public class TasksController : ControllerBase
     }
 
     [HttpPost]
-    public async ValueTask<IActionResult> Insert(TaskInsertRequest request) => !ModelState.IsValid ? BadRequest(ModelState) : Ok(await _taskRepository.Insert(new Entities.Task
+    public async ValueTask<IActionResult> Create(TaskInsertRequest request) => !ModelState.IsValid ? BadRequest(ModelState) : Ok(await _taskRepository.Create(new Entities.Task
     {
         Id = request.Id,
         Name = request.Name,
