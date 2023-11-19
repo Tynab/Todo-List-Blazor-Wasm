@@ -3,8 +3,8 @@ using TodoListBlazorWasm.Api.Entities;
 using YANLib;
 using static System.DateTime;
 using static System.Guid;
-using static TodoListBlazorWasm.Api.Enums.Priority;
-using static TodoListBlazorWasm.Api.Enums.Status;
+using static TodoListBlazorWasm.Models.Enums.Priority;
+using static TodoListBlazorWasm.Models.Enums.Status;
 using Task = System.Threading.Tasks.Task;
 
 namespace TodoListBlazorWasm.Api.Data;
@@ -38,7 +38,7 @@ public class TodoListDbContextSeed
             {
                 Id = NewGuid(),
                 Name = "Task 1",
-                CreatedDate = UtcNow,
+                CreatedAt = UtcNow,
                 Priority = High,
                 Status = Open
             };

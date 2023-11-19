@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using TodoListBlazorWasm.Api.Enums;
+using TodoListBlazorWasm.Models.Enums;
 
 namespace TodoListBlazorWasm.Api.Entities;
 
@@ -12,13 +12,15 @@ public sealed class Task
     [MaxLength(100)]
     public required string Name { get; set; }
 
-    public Guid? AssigneeId { get; set; }
-
-    public DateTime CreatedDate { get; set; }
-
     public Priority Priority { get; set; }
 
     public Status Status { get; set; }
+
+    public Guid? AssigneeId { get; set; }
+
+    public DateTime CreatedAt { get; set; }
+
+    public DateTime? UpdatedAt { get; set; }
 
     [ForeignKey(nameof(AssigneeId))]
     public User? Assignee { get; set; }

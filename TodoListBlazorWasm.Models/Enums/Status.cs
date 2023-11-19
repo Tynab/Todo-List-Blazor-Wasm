@@ -1,4 +1,4 @@
-﻿namespace TodoListBlazorWasm.Api.Enums;
+﻿namespace TodoListBlazorWasm.Models.Enums;
 
 public enum Status
 {
