@@ -1,8 +1,8 @@
 ﻿using TodoListBlazorWasm.Models.Enums;
 
-namespace TodoListBlazorWasm.Models;
+namespace TodoListBlazorWasm.Models.Requests.Task;
 
-public sealed class TaskInsertRequest
+public sealed class TaskCreateRequest
 {
     public Guid Id { get; set; }
 

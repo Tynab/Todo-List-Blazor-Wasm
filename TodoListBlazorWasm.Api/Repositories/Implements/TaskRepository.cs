@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using TodoListBlazorWasm.Api.Data;
 
-namespace TodoListBlazorWasm.Api.Repositories;
+namespace TodoListBlazorWasm.Api.Repositories.Implements;
 
 public class TaskRepository : ITaskRepository
 {

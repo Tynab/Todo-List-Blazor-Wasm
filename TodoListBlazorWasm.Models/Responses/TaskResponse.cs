@@ -1,8 +1,8 @@
 ﻿using TodoListBlazorWasm.Models.Enums;
 
-namespace TodoListBlazorWasm.Models;
+namespace TodoListBlazorWasm.Models.Responses;
 
-public sealed class TaskDto
+public sealed class TaskResponse
 {
     public Guid Id { get; set; }
 
@@ -16,5 +16,5 @@ public sealed class TaskDto
 
     public DateTime? UpdatedAt { get; set; }
 
-    public UserDto? Assignee { get; set; }
+    public UserResponse? Assignee { get; set; }
 }

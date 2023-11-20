@@ -4,6 +4,7 @@ using TodoListBlazorWasm.Api.Data;
 using TodoListBlazorWasm.Api.Extensions;
 using TodoListBlazorWasm.Api.Options;
 using TodoListBlazorWasm.Api.Repositories;
+using TodoListBlazorWasm.Api.Repositories.Implements;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,14 +22,11 @@ builder.Services.AddTransient<ITaskRepository, TaskRepository>();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+builder.Services.AddCors(o => o.AddPolicy("CorsPolicy", b => b.SetIsOriginAllowed((h) => true).AllowAnyMethod().AllowAnyHeader().AllowCredentials()));
+
 var app = builder.Build();
 
-app.MigrateDbContext<TodoListDbContext>((c, s) =>
-{
-    var logger = s.GetService<ILogger<TodoListDbContextSeed>>();
-
-    new TodoListDbContextSeed().SeedAsync(c, logger!).Wait();
-});
+app.MigrateDbContext<TodoListDbContext>((c, s) => new TodoListDbContextSeed().SeedAsync(c, s.GetService<ILogger<TodoListDbContextSeed>>()!).Wait());
 
 if (app.Environment.IsDevelopment())
 {
@@ -37,6 +35,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseCors("CorsPolicy");
 app.UseAuthorization();
 app.MapControllers();
 app.Run();

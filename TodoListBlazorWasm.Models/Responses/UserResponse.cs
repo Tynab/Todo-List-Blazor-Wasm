@@ -1,6 +1,6 @@
-﻿namespace TodoListBlazorWasm.Models;
+﻿namespace TodoListBlazorWasm.Models.Responses;
 
-public sealed class UserDto
+public sealed class UserResponse
 {
     public Guid Id { get; set; }
 

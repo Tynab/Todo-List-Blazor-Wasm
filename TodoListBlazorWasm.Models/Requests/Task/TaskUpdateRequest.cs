@@ -1,6 +1,6 @@
 ﻿using TodoListBlazorWasm.Models.Enums;
 
-namespace TodoListBlazorWasm.Models;
+namespace TodoListBlazorWasm.Models.Requests.Task;
 
 public sealed class TaskUpdateRequest
 {

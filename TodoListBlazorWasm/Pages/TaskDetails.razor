@@ -1,0 +1,62 @@
+﻿@page "/taskdetails/{id}"
+
+@using TodoListBlazorWasm.Components;
+@using TodoListBlazorWasm.Models.Responses;
+@using TodoListBlazorWasm.Services;
+@using YANLib;
+
+@inject ITaskService TaskService;
+
+<PageTitle>Task details</PageTitle>
+
+<h1>Task details</h1>
+
+@if (_task is null)
+{
+    <LoadingIndicator></LoadingIndicator>
+}
+else
+{
+    <h3>Task @_task.Name</h3>
+    <table class="table">
+        <tr>
+            <td>Name</td>
+            <td>@_task.Name</td>
+        </tr>
+        <tr>
+            <td>Priority</td>
+            <td>@_task.Priority</td>
+        </tr>
+        <tr>
+            <td>Assignee</td>
+            <td>@(_task.Assignee is null ? string.Empty : $"{_task.Assignee.FirstName} {_task.Assignee.LastName}")</td>
+        </tr>
+        <tr>
+            <td>Status</td>
+            <td>@_task.Status</td>
+        </tr>
+        <tr>
+            <td>Created At</td>
+            <td>@_task.CreatedAt.ToString("dd/MM/yyyy HH:mm")</td>
+        </tr>
+        <tr>
+            <td>Updated At</td>
+            <td>@(_task.UpdatedAt.HasValue ? _task.UpdatedAt.Value.ToString("dd/MM/yyyy HH:mm") : string.Empty)</td>
+        </tr>
+    </table>
+}
+
+@code {
+    private TaskResponse? _task;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (id!.IsNotWhiteSpaceAndNull())
+        {
+            _task = await TaskService.Get(id!);
+        }
+    }
+
+    [Parameter]
+    public string? id { get; set; }
+}

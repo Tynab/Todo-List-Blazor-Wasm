@@ -1,12 +1,14 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using System.ComponentModel.DataAnnotations;
 using TodoListBlazorWasm.Api.Repositories;
-using TodoListBlazorWasm.Models;
+using TodoListBlazorWasm.Models.Requests.Task;
+using TodoListBlazorWasm.Models.Responses;
 using static System.DateTime;
 using static TodoListBlazorWasm.Models.Enums.Status;
 
 namespace TodoListBlazorWasm.Api.Controllers;
 
-[Route("api/[controller]")]
+[Route("api/tasks")]
 [ApiController]
 public class TasksController : ControllerBase
 {
@@ -15,7 +17,7 @@ public class TasksController : ControllerBase
     public TasksController(ITaskRepository taskRepository) => _taskRepository = taskRepository;
 
     [HttpGet]
-    public async ValueTask<IActionResult> GetAll() => Ok((await _taskRepository.GetAll()).Select(x => new TaskDto
+    public async ValueTask<IActionResult> GetAll() => Ok((await _taskRepository.GetAll()).Select(x => new TaskResponse
     {
         Id = x.Id,
         Name = x.Name,
@@ -23,7 +25,7 @@ public class TasksController : ControllerBase
         Status = x.Status,
         CreatedAt = x.CreatedAt,
         UpdatedAt = x.UpdatedAt,
-        Assignee = x.Assignee is null ? default : new UserDto
+        Assignee = x.Assignee is null ? default : new UserResponse
         {
             Id = x.Assignee.Id,
             FirstName = x.Assignee.FirstName,
@@ -36,7 +38,7 @@ public class TasksController : ControllerBase
     {
         var ent = await _taskRepository.Get(id);
 
-        return Ok(ent is null ? default : new TaskDto
+        return Ok(ent is null ? default : new TaskResponse
         {
             Id = ent.Id,
             Name = ent.Name,
@@ -44,7 +46,7 @@ public class TasksController : ControllerBase
             Status = ent.Status,
             CreatedAt = ent.CreatedAt,
             UpdatedAt = ent.UpdatedAt,
-            Assignee = ent.Assignee is null ? null : new UserDto
+            Assignee = ent.Assignee is null ? null : new UserResponse
             {
                 Id = ent.Assignee.Id,
                 FirstName = ent.Assignee.FirstName,
@@ -54,7 +56,7 @@ public class TasksController : ControllerBase
     }
 
     [HttpPost]
-    public async ValueTask<IActionResult> Create(TaskInsertRequest request) => !ModelState.IsValid ? BadRequest(ModelState) : Ok(await _taskRepository.Create(new Entities.Task
+    public async ValueTask<IActionResult> Create([Required] TaskCreateRequest request) => !ModelState.IsValid ? BadRequest(ModelState) : Ok(await _taskRepository.Create(new Entities.Task
     {
         Id = request.Id,
         Name = request.Name,
@@ -65,7 +67,7 @@ public class TasksController : ControllerBase
     }));
 
     [HttpPut("{id}")]
-    public async ValueTask<IActionResult> Update(Guid id, TaskUpdateRequest request)
+    public async ValueTask<IActionResult> Update(Guid id, [Required] TaskUpdateRequest request)
     {
         if (!ModelState.IsValid)
         {

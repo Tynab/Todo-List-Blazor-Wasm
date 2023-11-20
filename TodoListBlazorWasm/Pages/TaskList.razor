@@ -1,0 +1,44 @@
+﻿@page "/tasklist"
+
+@using TodoListBlazorWasm.Components;
+
+<PageTitle>Task list</PageTitle>
+
+<h1>Task list</h1>
+
+@if (_tasks is null)
+{
+    <LoadingIndicator></LoadingIndicator>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Priority</th>
+                <th>Assignee</th>
+                <th>Status</th>
+                <th>Created Date</th>
+                <th>Updated Date</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var task in _tasks)
+            {
+                <tr>
+                    <td>@task.Name</td>
+                    <td>@task.Priority</td>
+                    <td>@(task.Assignee is null ? string.Empty : $"{task.Assignee.FirstName} {task.Assignee.LastName}")</td>
+                    <td>@task.Status</td>
+                    <td>@task.CreatedAt.ToString("dd/MM/yyyy")</td>
+                    <td>@(task.UpdatedAt.HasValue ? task.UpdatedAt.Value.ToString("dd/MM/yyyy") : string.Empty)</td>
+                    <td>
+                        <a href="/taskdetails/@task.Id">Detail</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
