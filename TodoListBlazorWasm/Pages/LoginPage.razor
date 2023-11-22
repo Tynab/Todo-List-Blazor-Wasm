@@ -6,20 +6,20 @@
     <div class="card-body">
         <h5 class="card-title">Login</h5>
 
-        <EditForm Model="_loginRequest">
+        <EditForm Model="Login">
             <DataAnnotationsValidator />
             @* <ValidationSummary /> *@
 
             <div class="mb-3">
                 <label for="username">Username</label>
-                <InputText id="username" class="form-control" @bind-Value="_loginRequest.UserName" />
-                @* <ValidationMessage For="()=>_loginRequest.UserName" /> *@
+                <InputText id="username" class="form-control" @bind-Value="Login.UserName" />
+                @* <ValidationMessage For="()=>Login.UserName" /> *@
             </div>
 
             <div class="mb-3">
                 <label for="password">Password</label>
-                <InputText id="password" class="form-control" @bind-Value="_loginRequest.Password" />
-                @* <ValidationMessage For="()=>_loginRequest.Password" /> *@
+                <InputText id="password" class="form-control" @bind-Value="Login.Password" />
+                @* <ValidationMessage For="()=>Login.Password" /> *@
             </div>
 
             <button type="submit" class="btn btn-success">Login</button>
@@ -28,5 +28,5 @@
 </div>
 
 @code {
-    private LoginRequest _loginRequest = new LoginRequest();
+    private LoginRequest Login { get; set; } = new LoginRequest();
 }

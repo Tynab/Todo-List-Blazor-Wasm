@@ -9,7 +9,7 @@ public class TaskRepository : ITaskRepository
 
     public TaskRepository(TodoListDbContext dbContext) => _dbContext = dbContext;
 
-    public async ValueTask<IEnumerable<Entities.Task>> GetAll() => await _dbContext.Tasks.Include(x => x.Assignee).AsNoTracking().ToListAsync();
+    public async ValueTask<IEnumerable<Entities.Task>> GetAll() => await _dbContext.Tasks.Include(x => x.Assignee).AsNoTracking().ToArrayAsync();
 
     public async ValueTask<Entities.Task?> Get(Guid id) => await _dbContext.Tasks.Include(x => x.Assignee).AsNoTracking().FirstOrDefaultAsync(x => x.Id == id);
 

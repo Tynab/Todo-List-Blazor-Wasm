@@ -1,4 +1,4 @@
-﻿@page "/tasklist"
+﻿@page "/tasks"
 
 @using TodoListBlazorWasm.Components;
 
@@ -6,7 +6,7 @@
 
 <h1>Task list</h1>
 
-@if (_tasks is null)
+@if (Tasks is null)
 {
     <LoadingIndicator />
 }
@@ -26,7 +26,7 @@ else
         </thead>
 
         <tbody>
-            @foreach (var task in _tasks)
+            @foreach (var task in Tasks)
             {
                 <tr>
                     <td>@task.Name</td>
@@ -36,7 +36,7 @@ else
                     <td>@task.CreatedAt.ToString("dd/MM/yyyy")</td>
                     <td>@(task.UpdatedAt.HasValue ? task.UpdatedAt.Value.ToString("dd/MM/yyyy") : string.Empty)</td>
                     <td>
-                        <a href="/taskdetails/@task.Id">Detail</a>
+                        <a href="/task-details/@task.Id">Detail</a>
                     </td>
                 </tr>
             }

@@ -9,29 +9,7 @@ public class TaskService : ITaskService
 
     public TaskService(HttpClient httpClient) => _httpClient = httpClient;
 
-    public async ValueTask<List<TaskResponse>?> GetAll()
-    {
-        try
-        {
-            return await _httpClient.GetFromJsonAsync<List<TaskResponse>>("/api/tasks");
-        }
-        catch (Exception ex)
-        {
+    public async ValueTask<List<TaskResponse>?> GetAll() => await _httpClient.GetFromJsonAsync<List<TaskResponse>>("/api/tasks");
 
-            throw;
-        }
-    }
-
-    public async ValueTask<TaskResponse?> Get(string id)
-    {
-        try
-        {
-            return await _httpClient.GetFromJsonAsync<TaskResponse>($"/api/tasks/{id}");
-        }
-        catch (Exception ex)
-        {
-
-            throw;
-        }
-    }
+    public async ValueTask<TaskResponse?> Get(string id) => await _httpClient.GetFromJsonAsync<TaskResponse>($"/api/tasks/{id}");
 }

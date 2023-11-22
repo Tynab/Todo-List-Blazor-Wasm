@@ -1,4 +1,6 @@
-﻿<div class="top-row ps-3 navbar navbar-dark">
+﻿@using static Microsoft.AspNetCore.Components.Routing.NavLinkMatch;
+
+<div class="top-row ps-3 navbar navbar-dark">
     <div class="container-fluid">
         <a class="navbar-brand" href="">TodoListBlazorWasm</a>
 
@@ -11,13 +13,13 @@
 <div class="@NavMenuCssClass nav-scrollable" @onclick="ToggleNavMenu">
     <nav class="flex-column">
         <div class="nav-item px-3">
-            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
+            <NavLink class="nav-link" href="" Match="All">
                 <span class="oi oi-home" aria-hidden="true" /> Home
             </NavLink>
         </div>
 
         <div class="nav-item px-3">
-            <NavLink class="nav-link" href="tasklist">
+            <NavLink class="nav-link" href="tasks">
                 <span class="oi oi-list-rich" aria-hidden="true" /> Task list
             </NavLink>
         </div>
