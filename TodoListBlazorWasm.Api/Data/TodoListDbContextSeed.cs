@@ -9,7 +9,7 @@ using Task = System.Threading.Tasks.Task;
 
 namespace TodoListBlazorWasm.Api.Data;
 
-public class TodoListDbContextSeed
+public sealed class TodoListDbContextSeed
 {
     private readonly IPasswordHasher<User> _passwordHasher = new PasswordHasher<User>();
 

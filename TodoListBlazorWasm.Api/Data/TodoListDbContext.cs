@@ -4,7 +4,7 @@ using TodoListBlazorWasm.Api.Entities;
 
 namespace TodoListBlazorWasm.Api.Data;
 
-public class TodoListDbContext : IdentityDbContext<User, Role, Guid>
+public sealed class TodoListDbContext : IdentityDbContext<User, Role, Guid>
 {
     public TodoListDbContext(DbContextOptions<TodoListDbContext> options) : base(options)
     {

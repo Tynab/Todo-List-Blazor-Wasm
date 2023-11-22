@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace TodoListBlazorWasm.Api.Entities;
 
-public class User : IdentityUser<Guid>
+public sealed class User : IdentityUser<Guid>
 {
     [MaxLength(100)]
     public required string FirstName { get; set; }

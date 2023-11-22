@@ -17,7 +17,7 @@ namespace TodoListBlazorWasm.Api.Controllers;
 
 [Route("api/login")]
 [ApiController]
-public class LoginController : ControllerBase
+public sealed class LoginController : ControllerBase
 {
     private readonly IConfiguration _configuration;
     private readonly SignInManager<User> _signInManager;

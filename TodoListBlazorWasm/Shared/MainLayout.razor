@@ -1,4 +1,6 @@
-﻿@inherits LayoutComponentBase
+﻿@using Microsoft.AspNetCore.Components.Authorization;
+
+@inherits LayoutComponentBase
 
 <div class="page">
     <div class="sidebar">
@@ -7,7 +9,17 @@
 
     <main>
         <div class="top-row px-4">
-            <a href="/login" class="ms-md-auto">Login</a>
+            <AuthorizeView>
+                <Authorized>
+                    Hello, @context.User.Identity!.Name
+                    <a href="/logout">Logout</a>
+                </Authorized>
+
+                <NotAuthorized>
+                    <a href="/login" class="ms-md-auto">Login</a>
+                </NotAuthorized>
+            </AuthorizeView>
+
             <a href="https://docs.microsoft.com/aspnet/" target="_blank">About</a>
         </div>
 

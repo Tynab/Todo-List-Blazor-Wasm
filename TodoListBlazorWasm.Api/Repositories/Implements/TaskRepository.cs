@@ -3,7 +3,7 @@ using TodoListBlazorWasm.Api.Data;
 
 namespace TodoListBlazorWasm.Api.Repositories.Implements;
 
-public class TaskRepository : ITaskRepository
+public sealed class TaskRepository : ITaskRepository
 {
     private readonly TodoListDbContext _dbContext;
 

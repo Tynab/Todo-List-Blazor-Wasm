@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace TodoListBlazorWasm.Api.Entities;
 
-public class Role : IdentityRole<Guid>
+public sealed class Role : IdentityRole<Guid>
 {
     [MaxLength(250)]
     public required string Description { get; set; }

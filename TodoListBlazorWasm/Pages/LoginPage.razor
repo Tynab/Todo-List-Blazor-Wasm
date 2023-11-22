@@ -1,12 +1,23 @@
 ﻿@page "/login"
 
 @using TodoListBlazorWasm.Models.Requests;
+@using TodoListBlazorWasm.Services;
+
+@inject IAuthService AuthService;
+@inject NavigationManager NavigationManager;
+
+@if (ShowErrors)
+{
+    <div class="alert alert-danger">
+        <p>@Error</p>
+    </div>
+}
 
 <div class="card">
     <div class="card-body">
         <h5 class="card-title">Login</h5>
 
-        <EditForm Model="Login">
+        <EditForm Model="Login" OnValidSubmit="HandleLogin">
             <DataAnnotationsValidator />
             @* <ValidationSummary /> *@
 
@@ -18,7 +29,7 @@
 
             <div class="mb-3">
                 <label for="password">Password</label>
-                <InputText id="password" class="form-control" @bind-Value="Login.Password" />
+                <InputText id="password" class="form-control" type="password" @bind-Value="Login.Password" />
                 @* <ValidationMessage For="()=>Login.Password" /> *@
             </div>
 
@@ -28,5 +39,34 @@
 </div>
 
 @code {
+    private async Task HandleLogin()
+    {
+        ShowErrors = default;
+
+        var rslt = await AuthService.Login(Login);
+
+        if (rslt is null)
+        {
+            ShowErrors = true;
+            Error = "Not responding";
+        }
+        else
+        {
+            if (rslt.Success)
+            {
+                NavigationManager.NavigateTo("/tasks");
+            }
+            else
+            {
+                ShowErrors = true;
+                Error = rslt.Error ?? "Not responding";
+            }
+        }
+    }
+
+    private bool ShowErrors { get; set; }
+
+    private string Error { get; set; } = string.Empty;
+
     private LoginRequest Login { get; set; } = new LoginRequest();
 }

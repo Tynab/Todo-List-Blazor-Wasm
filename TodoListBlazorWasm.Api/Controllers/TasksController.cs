@@ -10,7 +10,7 @@ namespace TodoListBlazorWasm.Api.Controllers;
 
 [Route("api/tasks")]
 [ApiController]
-public class TasksController : ControllerBase
+public sealed class TasksController : ControllerBase
 {
     private readonly ITaskRepository _taskRepository;
 

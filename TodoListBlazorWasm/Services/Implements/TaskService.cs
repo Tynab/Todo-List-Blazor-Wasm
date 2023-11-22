@@ -3,7 +3,7 @@ using TodoListBlazorWasm.Models.Responses;
 
 namespace TodoListBlazorWasm.Services.Implements;
 
-public class TaskService : ITaskService
+public sealed class TaskService : ITaskService
 {
     private readonly HttpClient _httpClient;
 
