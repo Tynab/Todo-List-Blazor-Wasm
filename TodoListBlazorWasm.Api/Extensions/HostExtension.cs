@@ -13,20 +13,20 @@ public static class HostExtension
     {
         using (var scope = host.Services.CreateScope())
         {
-            var service = scope.ServiceProvider;
-            var logger = service.GetRequiredService<ILogger<TContext>>();
+            var svc = scope.ServiceProvider;
+            var logger = svc.GetRequiredService<ILogger<TContext>>();
 
             try
             {
                 logger.LogInformation("Migrating database associated with context {DbContextName}", typeof(TContext).Name);
 
-                var retries = 10;
+                var rtrys = 10;
 
                 Handle<SqlException>().WaitAndRetry(
-                    retryCount: retries,
+                    retryCount: rtrys,
                     sleepDurationProvider: r => FromSeconds(Pow(2, r)),
-                    onRetry: (e, t, r, c) => logger.LogWarning(e, "[{Prefix}] Exception {ExceptionType} with message {Message} detected on attempt {Retry} of {Retries}", nameof(TContext), e.GetType().Name, e.Message, r, retries)
-                ).Execute(() => InvokeSeeder(seeder!, service.GetService<TContext>(), service));
+                    onRetry: (e, t, r, c) => logger.LogWarning(e, "[{Prefix}] Exception {ExceptionType} with message {Message} detected on attempt {Retry} of {Retries}", nameof(TContext), e.GetType().Name, e.Message, r, rtrys)
+                ).Execute(() => InvokeSeeder(seeder, svc.GetService<TContext>(), svc));
                 logger.LogInformation("Migrated database associated with context {DbContext}", typeof(TContext).Name);
             }
             catch (Exception ex)

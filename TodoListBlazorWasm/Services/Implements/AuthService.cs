@@ -11,35 +11,35 @@ namespace TodoListBlazorWasm.Services.Implements;
 public sealed class AuthService : IAuthService
 {
     private readonly HttpClient _httpClient;
-    private readonly ILocalStorageService _localStorageService;
     private readonly AuthenticationStateProvider _authenticationStateProvider;
+    private readonly ILocalStorageService _localStorageService;
 
-    public AuthService(HttpClient httpClient, ILocalStorageService localStorageService, AuthenticationStateProvider authenticationStateProvider)
+    public AuthService(HttpClient httpClient, AuthenticationStateProvider authenticationStateProvider, ILocalStorageService localStorageService)
     {
         _httpClient = httpClient;
-        _localStorageService = localStorageService;
         _authenticationStateProvider = authenticationStateProvider;
+        _localStorageService = localStorageService;
     }
 
     public async ValueTask<LoginResponse?> Login(LoginRequest request)
     {
-        var rslt = await _httpClient.PostAsJsonAsync("/api/login", request);
-        var res = (await rslt.Content.ReadAsStringAsync()).Deserialize<LoginResponse>();
+        var res = await _httpClient.PostAsJsonAsync("api/login", request);
+        var rslt = (await res.Content.ReadAsStringAsync()).Deserialize<LoginResponse>();
 
-        if (rslt.IsSuccessStatusCode)
+        if (res.IsSuccessStatusCode && rslt is not null)
         {
-            await _localStorageService.SetItemAsync("authToken", res!.Token);
+            await _localStorageService.SetItemAsync("authToken", rslt.Token);
             ((ApiAuthenticationStateProvider)_authenticationStateProvider).MarkUserAsAuthenticated(request.UserName!);
-            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", res.Token);
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", rslt.Token);
         }
 
-        return res;
+        return rslt;
     }
 
     public async Task Logout()
     {
         await _localStorageService.RemoveItemAsync("authToken");
         ((ApiAuthenticationStateProvider)_authenticationStateProvider).MarkUserAsLoggedOut();
-        _httpClient.DefaultRequestHeaders.Authorization = null;
+        _httpClient.DefaultRequestHeaders.Authorization = default;
     }
 }

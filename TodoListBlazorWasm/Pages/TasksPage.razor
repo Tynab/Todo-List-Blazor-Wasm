@@ -1,0 +1,87 @@
+﻿@page "/tasks"
+
+@using Microsoft.AspNetCore.Authorization
+@using TodoListBlazorWasm.Components;
+@using TodoListBlazorWasm.Models.Enums;
+@using static System.Enum;
+
+@attribute [Authorize]
+
+<PageTitle>Task list</PageTitle>
+
+<h1>Task list</h1>
+
+@if (Tasks is null || Assignees is null)
+{
+    <LoadingIndicator />
+}
+else
+{
+    <div class="row">
+        <EditForm Model="@TasksSearch">
+            <div class="row">
+                <div class="col">
+                    <label>Name</label>
+                    <InputText class="form-control" @bind-Value="TasksSearch!.Name" />
+                </div>
+
+                <div class="col">
+                    <label>Assignee</label>
+                    <InputSelect class="form-control" @bind-Value="TasksSearch.AssigneeId">
+                        @foreach (var asignee in Assignees!)
+                        {
+                            <option value="@asignee.Id">@($"{asignee.LastName} {asignee.FirstName}")</option>
+                        }
+                    </InputSelect>
+                </div>
+
+                <div class="col">
+                    <label>Name</label>
+                    <InputSelect class="form-control" @bind-Value="TasksSearch.Priority">
+                        @foreach (var item in GetNames(typeof(Priority)))
+                        {
+                            <option value="@item">@item</option>
+                        }
+                    </InputSelect>
+                </div>
+
+                <div class="col">
+                    <button type="submit" class="btn btn-success">Search</button>
+                </div>
+            </div>
+        </EditForm>
+    </div>
+
+    <div class="row mt-4">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Priority</th>
+                    <th>Assignee</th>
+                    <th>Status</th>
+                    <th>Created Date</th>
+                    <th>Updated Date</th>
+                    <th />
+                </tr>
+            </thead>
+
+            <tbody>
+                @foreach (var task in Tasks)
+                {
+                    <tr>
+                        <td>@task.Name</td>
+                        <td>@task.Priority</td>
+                        <td>@(task.Assignee is null ? string.Empty : $"{task.Assignee.FirstName} {task.Assignee.LastName}")</td>
+                        <td>@task.Status</td>
+                        <td>@task.CreatedAt.ToString("dd/MM/yyyy")</td>
+                        <td>@(task.UpdatedAt.HasValue ? task.UpdatedAt.Value.ToString("dd/MM/yyyy") : string.Empty)</td>
+                        <td>
+                            <a href="/task-details/@task.Id">Detail</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}

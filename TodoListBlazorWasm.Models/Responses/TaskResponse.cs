@@ -6,7 +6,7 @@ public sealed class TaskResponse
 {
     public Guid Id { get; set; }
 
-    public required string Name { get; set; }
+    public string? Name { get; set; }
 
     public Priority Priority { get; set; }
 

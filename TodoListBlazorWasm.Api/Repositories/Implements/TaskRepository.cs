@@ -17,14 +17,38 @@ public sealed class TaskRepository : ITaskRepository
     {
         var ent = await _dbContext.Tasks.AddAsync(task);
 
-        return await _dbContext.SaveChangesAsync() > 0 ? ent.Entity : default;
+        if (await _dbContext.SaveChangesAsync() > 0)
+        {
+            if (ent.Entity.AssigneeId is not null)
+            {
+                ent.Entity.Assignee = _dbContext.Users.AsNoTracking().FirstOrDefault(x => x.Id == ent.Entity.AssigneeId);
+            }
+
+            return ent.Entity;
+        }
+        else
+        {
+            return default;
+        }
     }
 
     public async ValueTask<Entities.Task?> Update(Entities.Task task)
     {
         var ent = _dbContext.Tasks.Update(task);
 
-        return await _dbContext.SaveChangesAsync() > 0 ? ent.Entity : default;
+        if (await _dbContext.SaveChangesAsync() > 0)
+        {
+            if (ent.Entity.AssigneeId is not null)
+            {
+                ent.Entity.Assignee = _dbContext.Users.AsNoTracking().FirstOrDefault(x => x.Id == ent.Entity.AssigneeId);
+            }
+
+            return ent.Entity;
+        }
+        else
+        {
+            return default;
+        }
     }
 
     public async ValueTask<Entities.Task?> Delete(Entities.Task task)

@@ -13,7 +13,7 @@ public sealed class TodoListDbContextSeed
 {
     private readonly IPasswordHasher<User> _passwordHasher = new PasswordHasher<User>();
 
-    public async Task SeedAsync(TodoListDbContext context, ILogger<TodoListDbContextSeed> logger)
+    public async Task SeedAsync(ILogger<TodoListDbContextSeed> logger, TodoListDbContext context)
     {
         if (!context.Users.Any())
         {

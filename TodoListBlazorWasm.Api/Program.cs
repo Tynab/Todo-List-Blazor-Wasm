@@ -13,20 +13,14 @@ using TodoListBlazorWasm.Api.Repositories.Implements;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.ConfigureOptions<DatabaseOptionsSetup>();
-
-builder.Services.AddDbContext<TodoListDbContext>((p, o) =>
-{
-    var databaseOptions = p.GetService<IOptions<DatabaseOptions>>()?.Value;
-
-    _ = o.UseSqlServer(databaseOptions?.ConnectionString);
-});
-
-builder.Services.AddIdentity<User, Role>().AddEntityFrameworkStores<TodoListDbContext>();
+builder.Services.AddDbContext<TodoListDbContext>((p, o) => o.UseSqlServer(p.GetService<IOptions<DatabaseOptions>>()?.Value.ConnectionString));
 builder.Services.AddControllers();
-builder.Services.AddTransient<ITaskRepository, TaskRepository>();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddTransient<IUserRepository, UserRepository>();
+builder.Services.AddTransient<ITaskRepository, TaskRepository>();
 builder.Services.AddCors(o => o.AddPolicy("CorsPolicy", b => b.SetIsOriginAllowed((h) => true).AllowAnyMethod().AllowAnyHeader().AllowCredentials()));
+builder.Services.AddIdentity<User, Role>().AddEntityFrameworkStores<TodoListDbContext>();
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(o => o.TokenValidationParameters = new TokenValidationParameters
 {
@@ -41,14 +35,13 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJw
 
 var app = builder.Build();
 
-app.MigrateDbContext<TodoListDbContext>((c, s) => new TodoListDbContextSeed().SeedAsync(c, s.GetService<ILogger<TodoListDbContextSeed>>()!).Wait());
-
 if (app.Environment.IsDevelopment())
 {
     _ = app.UseSwagger();
     _ = app.UseSwaggerUI();
 }
 
+app.MigrateDbContext<TodoListDbContext>((c, s) => new TodoListDbContextSeed().SeedAsync(s.GetService<ILogger<TodoListDbContextSeed>>()!, c).Wait());
 app.UseHttpsRedirection();
 app.UseCors("CorsPolicy");
 app.UseAuthentication();

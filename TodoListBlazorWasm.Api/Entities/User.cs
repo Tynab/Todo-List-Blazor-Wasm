@@ -10,4 +10,6 @@ public sealed class User : IdentityUser<Guid>
 
     [MaxLength(100)]
     public required string LastName { get; set; }
+
+    public ICollection<Task>? Tasks { get; set; }
 }

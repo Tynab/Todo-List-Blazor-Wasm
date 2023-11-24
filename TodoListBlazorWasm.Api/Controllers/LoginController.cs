@@ -29,18 +29,18 @@ public sealed class LoginController : ControllerBase
     }
 
     [HttpPost]
-    public async ValueTask<IActionResult> Login([Required] LoginRequest request) => !(await _signInManager.PasswordSignInAsync(request.UserName!, request.Password!, false, false)).Succeeded
-        ? BadRequest(new LoginResponse
-        {
-            Success = false,
-            Error = "Username or Password are invalid"
-        })
-        : Ok(new LoginResponse
+    public async ValueTask<IActionResult> Login([Required] LoginRequest request) => (await _signInManager.PasswordSignInAsync(request.UserName!, request.Password!, false, false)).Succeeded
+        ? Ok(new LoginResponse
         {
             Success = true,
             Token = new JwtSecurityTokenHandler().WriteToken(new JwtSecurityToken(_configuration["JwtIssuer"], _configuration["JwtAudience"], new[]
             {
                 new Claim(Name, request.UserName!)
             }, expires: Now.AddDays(_configuration["JwtExpiryInDays"]!.ToInt(1)), signingCredentials: new SigningCredentials(new SymmetricSecurityKey(UTF8.GetBytes(_configuration["JwtSecurityKey"] ?? string.Empty)), HmacSha256)))
+        })
+        : BadRequest(new LoginResponse
+        {
+            Success = false,
+            Error = "Username or Password are invalid"
         });
 }

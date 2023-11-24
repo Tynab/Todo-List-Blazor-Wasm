@@ -4,6 +4,7 @@ using System.Net.Http.Headers;
 using System.Security.Claims;
 using System.Text.Json;
 using YANLib;
+using static System.Convert;
 using static System.Security.Claims.ClaimTypes;
 using static System.Text.Json.JsonSerializer;
 using static System.Threading.Tasks.Task;
@@ -35,46 +36,55 @@ public sealed class ApiAuthenticationStateProvider : AuthenticationStateProvider
         return new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity(ParseClaimsFromJwt(tk), "jwt")));
     }
 
-    public void MarkUserAsAuthenticated(string usernam) => NotifyAuthenticationStateChanged(FromResult(new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity(new[]
+    public void MarkUserAsAuthenticated(string email) => NotifyAuthenticationStateChanged(FromResult(new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity(new[]
     {
-        new Claim(Name, usernam)
+        new Claim(Name, email)
     }, "apiauth")))));
 
     public void MarkUserAsLoggedOut() => NotifyAuthenticationStateChanged(FromResult(new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity()))));
 
-    private static IEnumerable<Claim>? ParseClaimsFromJwt(string jwt)
+    private static IEnumerable<Claim> ParseClaimsFromJwt(string jwt)
     {
-        var claims = new List<Claim>();
-        var keyValPrs = Deserialize<Dictionary<string, object>>(ParseBase64WithoutPadding(jwt.Split('.')[1]));
+        var rslt = new List<Claim>();
 
-        if (keyValPrs!.TryGetValue(Role, out var roles))
+        var keyValPrs = Deserialize<Dictionary<string, object>>(ParseBase64WithoutPadding(jwt.Split('.')[1]), new JsonSerializerOptions
         {
-            if (roles is not null)
+            PropertyNameCaseInsensitive = true,
+        });
+
+        if (keyValPrs is not null && keyValPrs.TryGetValue(Role, out var rawRoles))
+        {
+            if (rawRoles is not null)
             {
-                var sRoles = roles.ToString();
+                var sRoles = rawRoles.ToString();
 
                 if (sRoles!.Trim().StartsWith("["))
                 {
-                    foreach (var role in sRoles.Deserialize<string[]>()!)
+                    var roles = sRoles.Deserialize<string[]>();
+
+                    if (roles?.Length > 0)
                     {
-                        claims.Add(new Claim(Role, role));
+                        foreach (var role in roles)
+                        {
+                            rslt.Add(new Claim(Role, role));
+                        }
                     }
                 }
                 else
                 {
-                    claims.Add(new Claim(Role, sRoles));
+                    rslt.Add(new Claim(Role, sRoles));
                 }
 
                 _ = keyValPrs.Remove(Role);
             }
 
-            claims.AddRange(keyValPrs.Select(x => new Claim(x.Key, x.Value.ToString()!)));
+            rslt.AddRange(keyValPrs.Select(x => new Claim(x.Key, x.Value.ToString()!)));
         }
 
-        return default;
+        return rslt;
     }
 
-    private static byte[] ParseBase64WithoutPadding(string base64) => Convert.FromBase64String($"{base64}{(base64.Length % 4) switch
+    private static byte[] ParseBase64WithoutPadding(string base64) => FromBase64String($"{base64}{(base64.Length % 4) switch
     {
         2 => "==",
         3 => "=",
