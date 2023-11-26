@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
 using TodoListBlazorWasm.Api.Repositories;
+using TodoListBlazorWasm.Models.Dtos;
 using TodoListBlazorWasm.Models.Requests.Task;
 using TodoListBlazorWasm.Models.Responses;
 using YANLib;
@@ -56,6 +57,23 @@ public sealed class TasksController : ControllerBase
         });
     }
 
+    [HttpGet("search")]
+    public async ValueTask<IActionResult> Search([Required][FromQuery] TasksSearchDto tasksSearch) => Ok((await _repository.Search(tasksSearch)).Select(x => new TaskResponse
+    {
+        Id = x.Id,
+        Name = x.Name,
+        Priority = x.Priority,
+        Status = x.Status,
+        CreatedAt = x.CreatedAt,
+        UpdatedAt = x.UpdatedAt,
+        Assignee = x.Assignee is null ? default : new UserResponse
+        {
+            Id = x.Assignee.Id,
+            FirstName = x.Assignee.FirstName,
+            LastName = x.Assignee.LastName,
+        }
+    }));
+
     [HttpPost]
     public async ValueTask<IActionResult> Create([Required] TaskCreateRequest request)
     {
@@ -67,7 +85,7 @@ public sealed class TasksController : ControllerBase
         var rslt = await _repository.Create(new Entities.Task
         {
             Id = request.Id,
-            Name = request.Name,
+            Name = request.Name!,
             AssigneeId = request.AssigneeId,
             Priority = request.Priority,
             Status = Open,
@@ -77,6 +95,47 @@ public sealed class TasksController : ControllerBase
         return rslt is null ? Problem() : Ok(new TaskResponse
         {
             Id = rslt!.Id,
+            Name = rslt.Name,
+            Priority = rslt.Priority,
+            Status = rslt.Status,
+            CreatedAt = rslt.CreatedAt,
+            UpdatedAt = rslt.UpdatedAt,
+            Assignee = rslt.Assignee is null ? default : new UserResponse
+            {
+                Id = rslt.Assignee.Id,
+                FirstName = rslt.Assignee.FirstName,
+                LastName = rslt.Assignee.LastName,
+            }
+        });
+    }
+
+    [HttpPut("{id}")]
+    public async ValueTask<IActionResult> Edit(Guid id, [Required] TaskEditRequest request)
+    {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+
+        var ent = await _repository.Get(id);
+
+        if (ent is null)
+        {
+            return NotFound($"{id} is not found!");
+        }
+
+        ent.Name = request.Name!;
+        ent.AssigneeId = request.AssigneeId;
+        ent.Priority = request.Priority;
+        ent.Status = request.Status;
+        ent.UpdatedAt = Now;
+        ent.Assignee = null;
+
+        var rslt = await _repository.Update(ent);
+
+        return rslt is null ? Problem() : Ok(new TaskResponse
+        {
+            Id = rslt.Id,
             Name = rslt.Name,
             Priority = rslt.Priority,
             Status = rslt.Status,
@@ -125,6 +184,9 @@ public sealed class TasksController : ControllerBase
         {
             ent.Status = request.Status.Value;
         }
+
+        ent.UpdatedAt = Now;
+        ent.Assignee = null;
 
         var rslt = await _repository.Update(ent);
 

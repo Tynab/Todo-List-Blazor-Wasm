@@ -1,10 +1,11 @@
-﻿@page "/task-details/{id}"
+﻿@page "/task-detail/{id}"
 
 @using TodoListBlazorWasm.Components;
 @using TodoListBlazorWasm.Models.Responses;
 @using TodoListBlazorWasm.Services;
 @using YANLib;
 
+@inject IConfiguration Configuration;
 @inject ITaskService TaskService;
 
 <PageTitle>Task details</PageTitle>
@@ -22,27 +23,33 @@ else
     <table class="table">
         <tr>
             <td>Priority</td>
-            <td>@Task.Priority</td>
+
+            <td>
+                <PriorityLabel Priority="Task.Priority" />
+            </td>
         </tr>
 
         <tr>
             <td>Assignee</td>
-            <td>@(Task.Assignee is null ? string.Empty : $"{Task.Assignee.FirstName} {Task.Assignee.LastName}")</td>
+            <td>@(Task.Assignee is null ? "N/A" : $"{Task.Assignee.FirstName} {Task.Assignee.LastName}")</td>
         </tr>
 
         <tr>
             <td>Status</td>
-            <td>@Task.Status</td>
+
+            <td>
+                <StatusLabel Status="Task.Status" />
+            </td>
         </tr>
 
         <tr>
             <td>Created At</td>
-            <td>@Task.CreatedAt.ToString("dd/MM/yyyy HH:mm")</td>
+            <td>@Task.CreatedAt.ToString(Configuration["DateTimeFormat"])</td>
         </tr>
 
         <tr>
             <td>Updated At</td>
-            <td>@(Task.UpdatedAt.HasValue ? Task.UpdatedAt.Value.ToString("dd/MM/yyyy HH:mm") : string.Empty)</td>
+            <td>@(Task.UpdatedAt.HasValue ? Task.UpdatedAt.Value.ToString(Configuration["DateTimeFormat"]) : "N/A")</td>
         </tr>
     </table>
 }
@@ -52,7 +59,16 @@ else
     {
         if (Id!.IsNotWhiteSpaceAndNull())
         {
-            Task = await TaskService.Get(Id!);
+            var ent = await TaskService.Get(Id!);
+
+            if (ent is null)
+            {
+                Task = new TaskResponse();
+            }
+            else
+            {
+                Task = ent;
+            }
         }
     }
 

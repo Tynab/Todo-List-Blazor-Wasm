@@ -5,7 +5,9 @@
 @using TodoListBlazorWasm.Models.Enums;
 @using static System.Enum;
 
-@attribute [Authorize]
+@inject IConfiguration Configuration;
+
+@* @attribute [Authorize] *@
 
 <PageTitle>Task list</PageTitle>
 
@@ -18,7 +20,7 @@
 else
 {
     <div class="row">
-        <EditForm Model="@TasksSearch">
+        <EditForm Model="TasksSearch" OnSubmit="SearchForm">
             <div class="row">
                 <div class="col">
                     <label>Name</label>
@@ -27,7 +29,10 @@ else
 
                 <div class="col">
                     <label>Assignee</label>
+
                     <InputSelect class="form-control" @bind-Value="TasksSearch.AssigneeId">
+                        <option>Select an asignee</option>
+
                         @foreach (var asignee in Assignees!)
                         {
                             <option value="@asignee.Id">@($"{asignee.LastName} {asignee.FirstName}")</option>
@@ -36,8 +41,11 @@ else
                 </div>
 
                 <div class="col">
-                    <label>Name</label>
+                    <label>Priority</label>
+
                     <InputSelect class="form-control" @bind-Value="TasksSearch.Priority">
+                        <option>Select a priority</option>
+
                         @foreach (var item in GetNames(typeof(Priority)))
                         {
                             <option value="@item">@item</option>
@@ -45,8 +53,12 @@ else
                     </InputSelect>
                 </div>
 
-                <div class="col">
-                    <button type="submit" class="btn btn-success">Search</button>
+                <div class="col pt-4">
+                    <button type="submit" class="btn btn-primary">Search</button>
+                </div>
+
+                <div class="col pt-4">
+                    <a href="/task-create" class="btn btn-success">Create</a>
                 </div>
             </div>
         </EditForm>
@@ -63,6 +75,7 @@ else
                     <th>Created Date</th>
                     <th>Updated Date</th>
                     <th />
+                    <th />
                 </tr>
             </thead>
 
@@ -71,13 +84,26 @@ else
                 {
                     <tr>
                         <td>@task.Name</td>
-                        <td>@task.Priority</td>
-                        <td>@(task.Assignee is null ? string.Empty : $"{task.Assignee.FirstName} {task.Assignee.LastName}")</td>
-                        <td>@task.Status</td>
-                        <td>@task.CreatedAt.ToString("dd/MM/yyyy")</td>
-                        <td>@(task.UpdatedAt.HasValue ? task.UpdatedAt.Value.ToString("dd/MM/yyyy") : string.Empty)</td>
+
                         <td>
-                            <a href="/task-details/@task.Id">Detail</a>
+                            <PriorityLabel Priority="task.Priority" />
+                        </td>
+
+                        <td>@(task.Assignee is null ? "N/A" : $"{task.Assignee.LastName} {task.Assignee.FirstName}")</td>
+
+                        <td>
+                            <StatusLabel Status="task.Status" />
+                        </td>
+
+                        <td>@task.CreatedAt.ToString(Configuration["DateFormat"])</td>
+                        <td>@(task.UpdatedAt.HasValue ? task.UpdatedAt.Value.ToString(Configuration["DateFormat"]) : "N/A")</td>
+
+                        <td>
+                            <a href="/task-edit/@task.Id">Edit</a>
+                        </td>
+
+                        <td>
+                            <a href="/task-detail/@task.Id">Detail</a>
                         </td>
                     </tr>
                 }

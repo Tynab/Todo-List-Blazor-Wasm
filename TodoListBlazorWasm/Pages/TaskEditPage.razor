@@ -1,0 +1,125 @@
+﻿@page "/task-edit/{id}"
+
+@using TodoListBlazorWasm.Components;
+@using TodoListBlazorWasm.Models.Enums;
+@using TodoListBlazorWasm.Models.Requests.Task;
+@using TodoListBlazorWasm.Models.Responses;
+@using TodoListBlazorWasm.Services;
+@using YANLib;
+@using static System.Enum;
+@using static System.Guid;
+
+@inject NavigationManager NavigationManager;
+@inject IToastService ToastService;
+@inject IUserService UserService;
+@inject ITaskService TaskService;
+
+<PageTitle>Task edit</PageTitle>
+
+<h1>Task edit</h1>
+
+@if (Task is null || Assignees is null)
+{
+    <LoadingIndicator />
+}
+else
+{
+    <EditForm Model="Task" OnValidSubmit="TaskEdit">
+        <DataAnnotationsValidator />
+
+        <div class="mb-3">
+            <label for="Name">Name</label>
+            <InputText class="form-control" @bind-Value="Task!.Name" />
+            <ValidationMessage For="()=>Task.Name" />
+            <small id="name-help" class="form-text text-muted">Enter the task title.</small>
+        </div>
+
+        <div class="mb-3">
+            <label>Assignee</label>
+
+            <InputSelect class="form-control" @bind-Value="Task.AssigneeId">
+                @foreach (var asignee in Assignees!)
+                {
+                    <option value="@asignee.Id">@($"{asignee.LastName} {asignee.FirstName}")</option>
+                }
+            </InputSelect>
+
+            <small id="name-help" class="form-text text-muted">Choose an assignee.</small>
+        </div>
+
+        <div class="mb-3">
+            <label for="Name">Priority</label>
+
+            <InputSelect class="form-control" @bind-Value="Task.Priority">
+                @foreach (var item in GetNames(typeof(Priority)))
+                {
+                    <option value="@item">@item</option>
+                }
+            </InputSelect>
+
+            <small id="name-help" class="form-text text-muted">Choose a priority.</small>
+        </div>
+
+        <div class="mb-3">
+            <label for="Name">Status</label>
+
+            <InputSelect class="form-control" @bind-Value="Task.Status">
+                @foreach (var item in GetNames(typeof(Status)))
+                {
+                    <option value="@item">@item</option>
+                }
+            </InputSelect>
+
+            <small id="name-help" class="form-text text-muted">Choose a status.</small>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </EditForm>
+}
+
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        Assignees = await UserService.GetAll();
+
+        if (Id!.IsNotWhiteSpaceAndNull())
+        {
+            var ent = await TaskService.Get(Id!);
+
+            if (ent is null)
+            {
+                Task = new TaskEditRequest();
+            }
+            else
+            {
+                Task = new TaskEditRequest
+                    {
+                        Name = ent.Name,
+                        AssigneeId = ent.Assignee is null ? NewGuid() : ent.Assignee.Id,
+                        Priority = ent.Priority,
+                        Status = ent.Status
+                    };
+            }
+        }
+    }
+
+    private async Task TaskEdit(EditContext context)
+    {
+        if (await TaskService.Edit(Id!, Task!))
+        {
+            ToastService.ShowSuccess($"{Task!.Name} has been edited");
+            NavigationManager.NavigateTo("/tasks");
+        }
+        else
+        {
+            ToastService.ShowError("An error occurred in progress");
+        }
+    }
+
+    [Parameter]
+    public string? Id { get; set; }
+
+    private TaskEditRequest? Task { get; set; }
+
+    private List<UserResponse>? Assignees { get; set; } = new List<UserResponse>();
+}

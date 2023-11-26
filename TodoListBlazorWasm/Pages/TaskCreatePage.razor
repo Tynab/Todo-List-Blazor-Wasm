@@ -1,0 +1,57 @@
+﻿@page "/task-create"
+
+@using TodoListBlazorWasm.Models.Enums;
+@using TodoListBlazorWasm.Models.Requests.Task;
+@using TodoListBlazorWasm.Services;
+@using static System.Enum;
+
+@inject NavigationManager NavigationManager;
+@inject IToastService ToastService;
+@inject ITaskService TaskService;
+
+<PageTitle>Task create</PageTitle>
+
+<h1>Task create</h1>
+
+<EditForm Model="Task" OnValidSubmit="TaskCreate">
+    <DataAnnotationsValidator />
+
+    <div class="mb-3">
+        <label for="Name">Name</label>
+        <InputText class="form-control" @bind-Value="Task.Name" />
+        <ValidationMessage For="()=>Task.Name" />
+        <small id="name-help" class="form-text text-muted">Enter the task title.</small>
+    </div>
+
+    <div class="mb-3">
+        <label for="Name">Priority</label>
+
+        <InputSelect class="form-control" @bind-Value="Task.Priority">
+            @foreach (var item in GetNames(typeof(Priority)))
+            {
+                <option value="@item">@item</option>
+            }
+        </InputSelect>
+
+        <small id="name-help" class="form-text text-muted">Choose a priority.</small>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Submit</button>
+</EditForm>
+
+@code {
+    private async Task TaskCreate(EditContext context)
+    {
+        if (await TaskService.Create(Task))
+        {
+            ToastService.ShowSuccess($"{Task.Name} has been created");
+            NavigationManager.NavigateTo("/tasks");
+        }
+        else
+        {
+            ToastService.ShowError("An error occurred in progress");
+        }
+    }
+
+    private TaskCreateRequest Task { get; set; } = new TaskCreateRequest();
+}

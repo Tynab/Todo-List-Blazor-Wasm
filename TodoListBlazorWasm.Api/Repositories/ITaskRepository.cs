@@ -1,10 +1,14 @@
-﻿namespace TodoListBlazorWasm.Api.Repositories;
+﻿using TodoListBlazorWasm.Models.Dtos;
+
+namespace TodoListBlazorWasm.Api.Repositories;
 
 public interface ITaskRepository
 {
     public ValueTask<IEnumerable<Entities.Task>> GetAll();
 
     public ValueTask<Entities.Task?> Get(Guid id);
+
+    public ValueTask<IEnumerable<Entities.Task>> Search(TasksSearchDto tasksSearch);
 
     public ValueTask<Entities.Task?> Create(Entities.Task task);
 

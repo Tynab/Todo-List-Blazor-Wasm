@@ -72,6 +72,33 @@ public sealed class UserController : ControllerBase
         });
     }
 
+    [HttpPut("{id}")]
+    public async ValueTask<IActionResult> Edit(Guid id, UserEditRequest request)
+    {
+        var ent = await _repository.Get(id);
+
+        if (ent is null)
+        {
+            return NotFound($"{id} is not found!");
+        }
+
+        ent.FirstName = request.FirstName!;
+        ent.LastName = request.LastName!;
+        ent.Email = request.Email;
+        ent.NormalizedEmail = request.Email!.ToUpperInvariant();
+        ent.PhoneNumber = request.PhoneNumber;
+        ent.PasswordHash = _passwordHasher.HashPassword(ent, request.Password!);
+
+        var rslt = await _repository.Update(ent);
+
+        return rslt is null ? Problem() : Ok(new UserResponse
+        {
+            Id = rslt.Id,
+            FirstName = rslt.FirstName,
+            LastName = rslt.LastName
+        });
+    }
+
     [HttpPatch("{id}")]
     public async ValueTask<IActionResult> Update(Guid id, UserUpdateRequest request)
     {

@@ -1,6 +1,18 @@
-﻿@using Microsoft.AspNetCore.Components.Authorization;
+﻿@using Blazored.Toast.Configuration;
+@using Microsoft.AspNetCore.Components.Authorization;
+@using static Blazored.Toast.Configuration.IconType;
+@using static Blazored.Toast.Configuration.ToastPosition;
 
 @inherits LayoutComponentBase
+
+<BlazoredToasts Position="BottomRight"
+                Timeout="5"
+                ShowProgressBar="true"
+                IconType="FontAwesome"
+                InfoIcon="fa fa-info"
+                SuccessIcon="fa fa-check"
+                WarningIcon="fa fa-exclamation"
+                ErrorIcon="fa fa-bug" />
 
 <div class="page">
     <div class="sidebar">

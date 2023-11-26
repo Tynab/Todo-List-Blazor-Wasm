@@ -1,5 +1,7 @@
-﻿using Microsoft.AspNetCore.Components;
-using TodoListBlazorWasm.Models.Enums;
+﻿using Blazored.Toast.Services;
+using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Forms;
+using TodoListBlazorWasm.Models.Dtos;
 using TodoListBlazorWasm.Models.Responses;
 using TodoListBlazorWasm.Services;
 
@@ -13,6 +15,15 @@ public sealed partial class TasksPage
         Assignees = await UserService!.GetAll();
     }
 
+    private async Task SearchForm(EditContext context)
+    {
+        ToastService!.ShowInfo("Seach completed");
+        Tasks = await TaskService!.Search(TasksSearch!);
+    }
+
+    [Inject]
+    private IToastService? ToastService { get; set; }
+
     [Inject]
     private ITaskService? TaskService { get; set; }
 
@@ -23,14 +34,5 @@ public sealed partial class TasksPage
 
     private List<UserResponse>? Assignees { get; set; } = new List<UserResponse>();
 
-    private TasksSearch? TasksSearch { get; set; } = new TasksSearch();
-}
-
-public sealed class TasksSearch
-{
-    public string? Name { get; set; }
-
-    public Guid AssigneeId { get; set; }
-
-    public Priority Priority { get; set; }
+    private TasksSearchDto? TasksSearch { get; set; } = new TasksSearchDto();
 }

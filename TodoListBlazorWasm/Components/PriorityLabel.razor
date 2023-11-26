@@ -1,0 +1,25 @@
+﻿@using TodoListBlazorWasm.Models.Enums;
+
+@switch (Priority)
+{
+    case Priority.Low:
+        {
+            <span class="badge bg-secondary">@nameof(Priority.Low)</span>
+            break;
+        }
+    case Priority.Medium:
+        {
+            <span class="badge bg-warning">@nameof(Priority.Medium)</span>
+            break;
+        }
+    case Priority.High:
+        {
+            <span class="badge bg-danger">@nameof(Priority.High)</span>
+            break;
+        }
+}
+
+@code {
+    [Parameter]
+    public Priority Priority { get; set; }
+}

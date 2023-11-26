@@ -1,0 +1,40 @@
+﻿@using TodoListBlazorWasm.Models.Enums;
+
+@switch (Status)
+{
+    case Status.Open:
+        {
+            <span class="badge bg-info">@nameof(Status.Open)</span>
+            break;
+        }
+    case Status.Inprogress:
+        {
+            <span class="badge bg-warning">@nameof(Status.Inprogress)</span>
+            break;
+        }
+    case Status.Resolved:
+        {
+            <span class="badge bg-primary">@nameof(Status.Resolved)</span>
+            break;
+        }
+    case Status.Done:
+        {
+            <span class="badge bg-success">@nameof(Status.Done)</span>
+            break;
+        }
+    case Status.Canceled:
+        {
+            <span class="badge bg-danger">@nameof(Status.Canceled)</span>
+            break;
+        }
+    case Status.Closed:
+        {
+            <span class="badge bg-secondary">@nameof(Status.Closed)</span>
+            break;
+        }
+}
+
+@code {
+    [Parameter]
+    public Status Status { get; set; }
+}
