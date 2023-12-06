@@ -109,30 +109,30 @@ public sealed class UserController : ControllerBase
             return NotFound($"{id} is not found!");
         }
 
-        if (request.FirstName!.IsNotWhiteSpaceAndNull())
+        if (request.FirstName.IsNotWhiteSpaceAndNull())
         {
-            ent.FirstName = request.FirstName!;
+            ent.FirstName = request.FirstName;
         }
 
-        if (request.LastName!.IsNotWhiteSpaceAndNull())
+        if (request.LastName.IsNotWhiteSpaceAndNull())
         {
-            ent.LastName = request.LastName!;
+            ent.LastName = request.LastName;
         }
 
-        if (request.Email!.IsNotWhiteSpaceAndNull())
+        if (request.Email.IsNotWhiteSpaceAndNull())
         {
             ent.Email = request.Email;
-            ent.NormalizedEmail = request.Email!.ToUpperInvariant();
+            ent.NormalizedEmail = request.Email.ToUpperInvariant();
         }
 
-        if (request.PhoneNumber!.IsNotWhiteSpaceAndNull())
+        if (request.PhoneNumber.IsNotWhiteSpaceAndNull())
         {
             ent.PhoneNumber = request.PhoneNumber;
         }
 
-        if (request.Password!.IsNotWhiteSpaceAndNull())
+        if (request.Password.IsNotWhiteSpaceAndNull())
         {
-            ent.PasswordHash = _passwordHasher.HashPassword(ent, request.Password!);
+            ent.PasswordHash = _passwordHasher.HashPassword(ent, request.Password);
         }
 
         var rslt = await _repository.Update(ent);

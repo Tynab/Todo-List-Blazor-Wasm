@@ -1,113 +1,114 @@
 ﻿@page "/tasks"
 
 @using Microsoft.AspNetCore.Authorization
-@using TodoListBlazorWasm.Components;
-@using TodoListBlazorWasm.Models.Enums;
-@using static System.Enum;
+@using TodoListBlazorWasm.Components
+@using TodoListBlazorWasm.Models.Enums
+@using TodoListBlazorWasm.Services
+@using YANLib
+@using static System.Enum
 
-@inject IConfiguration Configuration;
+@inject IConfiguration Configuration
+@inject IToastService ToastService
+@inject IUserService UserService
+@inject ITaskService TaskService
 
-@* @attribute [Authorize] *@
+@attribute [Authorize]
 
 <PageTitle>Task list</PageTitle>
-
 <h1>Task list</h1>
 
-@if (Tasks is null || Assignees is null)
+@if (Tasks.IsEmptyOrNull() || Assignees.IsEmptyOrNull())
 {
     <LoadingIndicator />
 }
 else
 {
-    <div class="row">
+    <div class="text-center mt-4">
         <EditForm Model="TasksSearch" OnSubmit="SearchForm">
-            <div class="row">
-                <div class="col">
-                    <label>Name</label>
-                    <InputText class="form-control" @bind-Value="TasksSearch!.Name" />
-                </div>
+            <div class="d-flex justify-content-center">
+                <div class="w-75">
+                    <div class="row">
+                        <div class="col">
+                            <label>Name</label>
+                            <InputText class="form-control text-center" placeholder="Enter a name" @bind-Value="TasksSearch!.Name" />
+                        </div>
 
-                <div class="col">
-                    <label>Assignee</label>
+                        <div class="col">
+                            <label>Assignee</label>
 
-                    <InputSelect class="form-control" @bind-Value="TasksSearch.AssigneeId">
-                        <option>Select an asignee</option>
+                            <InputSelect class="form-control text-center" @bind-Value="TasksSearch.AssigneeId">
+                                <option>Select an asignee</option>
 
-                        @foreach (var asignee in Assignees!)
-                        {
-                            <option value="@asignee.Id">@($"{asignee.LastName} {asignee.FirstName}")</option>
-                        }
-                    </InputSelect>
-                </div>
+                                @foreach (var asignee in Assignees)
+                                {
+                                    <option value="@asignee.Id">@($"{asignee.LastName} {asignee.FirstName}")</option>
+                                }
+                            </InputSelect>
+                        </div>
 
-                <div class="col">
-                    <label>Priority</label>
+                        <div class="col">
+                            <label>Priority</label>
 
-                    <InputSelect class="form-control" @bind-Value="TasksSearch.Priority">
-                        <option>Select a priority</option>
+                            <InputSelect class="form-control text-center" @bind-Value="TasksSearch.Priority">
+                                <option>Select a priority</option>
 
-                        @foreach (var item in GetNames(typeof(Priority)))
-                        {
-                            <option value="@item">@item</option>
-                        }
-                    </InputSelect>
-                </div>
+                                @foreach (var item in GetNames(typeof(Priority)))
+                                {
+                                    <option value="@item">@item</option>
+                                }
+                            </InputSelect>
+                        </div>
+                    </div>
 
-                <div class="col pt-4">
-                    <button type="submit" class="btn btn-primary">Search</button>
-                </div>
-
-                <div class="col pt-4">
-                    <a href="/task-create" class="btn btn-success">Create</a>
+                    <div class="mt-3">
+                        <div>
+                            <button type="submit" class="btn btn-primary">Search</button>
+                            <a href="/task-create" class="btn btn-success">Create</a>
+                        </div>
+                    </div>
                 </div>
             </div>
         </EditForm>
     </div>
 
-    <div class="row mt-4">
-        <table class="table">
-            <thead>
+    <table class="table align-middle text-center mt-4">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Priority</th>
+                <th>Assignee</th>
+                <th>Status</th>
+                <th>Created Date</th>
+                <th>Updated Date</th>
+                <th />
+            </tr>
+        </thead>
+
+        <tbody>
+            @foreach (var task in Tasks)
+            {
                 <tr>
-                    <th>Name</th>
-                    <th>Priority</th>
-                    <th>Assignee</th>
-                    <th>Status</th>
-                    <th>Created Date</th>
-                    <th>Updated Date</th>
-                    <th />
-                    <th />
+                    <td>@task.Name</td>
+
+                    <td>
+                        <PriorityLabel Priority="task.Priority" />
+                    </td>
+
+                    <td>@(task.Assignee is null ? "N/A" : $"{task.Assignee.LastName} {task.Assignee.FirstName}")</td>
+
+                    <td>
+                        <StatusLabel Status="task.Status" />
+                    </td>
+
+                    <td>@task.CreatedAt.ToString(Configuration["DateFormat"])</td>
+                    <td>@(task.UpdatedAt.HasValue ? task.UpdatedAt.Value.ToString(Configuration["DateFormat"]) : "N/A")</td>
+
+                    <td>
+                        <a href="/task-edit/@task.Id" class="btn btn-warning">Edit</a>
+                        <a href="/task-detail/@task.Id" class="btn btn-secondary">Detail</a>
+                    </td>
                 </tr>
-            </thead>
-
-            <tbody>
-                @foreach (var task in Tasks)
-                {
-                    <tr>
-                        <td>@task.Name</td>
-
-                        <td>
-                            <PriorityLabel Priority="task.Priority" />
-                        </td>
-
-                        <td>@(task.Assignee is null ? "N/A" : $"{task.Assignee.LastName} {task.Assignee.FirstName}")</td>
-
-                        <td>
-                            <StatusLabel Status="task.Status" />
-                        </td>
-
-                        <td>@task.CreatedAt.ToString(Configuration["DateFormat"])</td>
-                        <td>@(task.UpdatedAt.HasValue ? task.UpdatedAt.Value.ToString(Configuration["DateFormat"]) : "N/A")</td>
-
-                        <td>
-                            <a href="/task-edit/@task.Id">Edit</a>
-                        </td>
-
-                        <td>
-                            <a href="/task-detail/@task.Id">Detail</a>
-                        </td>
-                    </tr>
-                }
-            </tbody>
-        </table>
-    </div>
+            }
+        </tbody>
+    </table>
 }

@@ -29,14 +29,14 @@ public sealed class AuthService : IAuthService
         if (res.IsSuccessStatusCode && rslt is not null)
         {
             await _localStorageService.SetItemAsync("authToken", rslt.Token);
-            ((ApiAuthenticationStateProvider)_authenticationStateProvider).MarkUserAsAuthenticated(request.UserName!);
+            ((ApiAuthenticationStateProvider)_authenticationStateProvider).MarkUserAsAuthenticated(request.UserName);
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", rslt.Token);
         }
 
         return rslt;
     }
 
-    public async Task Logout()
+    public async ValueTask Logout()
     {
         await _localStorageService.RemoveItemAsync("authToken");
         ((ApiAuthenticationStateProvider)_authenticationStateProvider).MarkUserAsLoggedOut();

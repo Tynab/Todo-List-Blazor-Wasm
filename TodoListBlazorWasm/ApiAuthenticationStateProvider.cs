@@ -36,10 +36,18 @@ public sealed class ApiAuthenticationStateProvider : AuthenticationStateProvider
         return new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity(ParseClaimsFromJwt(tk), "jwt")));
     }
 
-    public void MarkUserAsAuthenticated(string email) => NotifyAuthenticationStateChanged(FromResult(new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity(new[]
+    public void MarkUserAsAuthenticated(string? email)
     {
-        new Claim(Name, email)
-    }, "apiauth")))));
+        if (email.IsWhiteSpaceOrNull())
+        {
+            return;
+        }
+
+        NotifyAuthenticationStateChanged(FromResult(new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity(new[]
+        {
+            new Claim(Name, email)
+        }, "apiauth")))));
+    }
 
     public void MarkUserAsLoggedOut() => NotifyAuthenticationStateChanged(FromResult(new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity()))));
 
@@ -62,7 +70,7 @@ public sealed class ApiAuthenticationStateProvider : AuthenticationStateProvider
                 {
                     var roles = sRoles.Deserialize<string[]>();
 
-                    if (roles?.Length > 0)
+                    if (roles.IsNotEmptyAndNull())
                     {
                         foreach (var role in roles)
                         {

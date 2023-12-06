@@ -13,7 +13,7 @@ public sealed class TodoListDbContextSeed
 {
     private readonly IPasswordHasher<User> _passwordHasher = new PasswordHasher<User>();
 
-    public async Task SeedAsync(ILogger<TodoListDbContextSeed> logger, TodoListDbContext context)
+    public async Task SeedAsync(ILogger<TodoListDbContextSeed>? logger, TodoListDbContext context)
     {
         if (!context.Users.Any())
         {
@@ -32,7 +32,7 @@ public sealed class TodoListDbContextSeed
 
             user.PasswordHash = _passwordHasher.HashPassword(user, "Admin@123");
             _ = await context.Users.AddAsync(user);
-            logger.LogInformation("Users add: {User}", user.CamelSerialize());
+            logger?.LogInformation("Users add: {User}", user.Serialize());
         }
 
         if (!context.Tasks.Any())
@@ -47,7 +47,7 @@ public sealed class TodoListDbContextSeed
             };
 
             _ = await context.Tasks.AddAsync(task);
-            logger.LogInformation("Tasks add: {Task}", task.CamelSerialize());
+            logger?.LogInformation("Tasks add: {Task}", task.Serialize());
         }
 
         _ = await context.SaveChangesAsync();

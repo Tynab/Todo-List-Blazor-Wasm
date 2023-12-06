@@ -165,9 +165,9 @@ public sealed class TasksController : ControllerBase
             return NotFound($"{id} is not found!");
         }
 
-        if (request.Name!.IsNotWhiteSpaceAndNull())
+        if (request.Name.IsNotWhiteSpaceAndNull())
         {
-            ent.Name = request.Name!;
+            ent.Name = request.Name;
         }
 
         if (request.AssigneeId.HasValue)

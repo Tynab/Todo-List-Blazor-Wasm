@@ -1,15 +1,17 @@
 ﻿@page "/task-detail/{id}"
 
-@using TodoListBlazorWasm.Components;
-@using TodoListBlazorWasm.Models.Responses;
-@using TodoListBlazorWasm.Services;
-@using YANLib;
+@using Microsoft.AspNetCore.Authorization
+@using TodoListBlazorWasm.Components
+@using TodoListBlazorWasm.Models.Responses
+@using TodoListBlazorWasm.Services
+@using YANLib
 
-@inject IConfiguration Configuration;
-@inject ITaskService TaskService;
+@inject IConfiguration Configuration
+@inject ITaskService TaskService
+
+@attribute [Authorize]
 
 <PageTitle>Task details</PageTitle>
-
 <h1>Task details</h1>
 
 @if (Task is null)
@@ -18,9 +20,9 @@
 }
 else
 {
-    <h3>@Task.Name</h3>
+    <h3 class="mt-4">@Task.Name</h3>
 
-    <table class="table">
+    <table class="table mt-3">
         <tr>
             <td>Priority</td>
 
@@ -57,9 +59,9 @@ else
 @code {
     protected override async Task OnInitializedAsync()
     {
-        if (Id!.IsNotWhiteSpaceAndNull())
+        if (Id.IsNotWhiteSpaceAndNull())
         {
-            var ent = await TaskService.Get(Id!);
+            var ent = await TaskService.Get(Id);
 
             if (ent is null)
             {

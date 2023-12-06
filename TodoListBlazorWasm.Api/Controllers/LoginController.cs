@@ -36,7 +36,7 @@ public sealed class LoginController : ControllerBase
             Token = new JwtSecurityTokenHandler().WriteToken(new JwtSecurityToken(_configuration["JwtIssuer"], _configuration["JwtAudience"], new[]
             {
                 new Claim(Name, request.UserName!)
-            }, expires: Now.AddDays(_configuration["JwtExpiryInDays"]!.ToInt(1)), signingCredentials: new SigningCredentials(new SymmetricSecurityKey(UTF8.GetBytes(_configuration["JwtSecurityKey"] ?? string.Empty)), HmacSha256)))
+            }, expires: Now.AddDays(_configuration["JwtExpiryInDays"].ToInt(1)), signingCredentials: new SigningCredentials(new SymmetricSecurityKey(UTF8.GetBytes(_configuration["JwtSecurityKey"] ?? string.Empty)), HmacSha256)))
         })
         : BadRequest(new LoginResponse
         {

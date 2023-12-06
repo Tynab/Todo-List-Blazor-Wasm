@@ -22,7 +22,7 @@
 		</PackageReference>
 		<PackageReference Include="Polly" Version="8.2.0" />
 		<PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
-		<PackageReference Include="Tynab.YANLib" Version="3.1.9" />
+		<PackageReference Include="Tynab.YANLib" Version="3.2.3" />
 	</ItemGroup>
 
 	<ItemGroup>

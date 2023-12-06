@@ -19,9 +19,9 @@ public sealed class TaskRepository : ITaskRepository
     {
         var qry = _dbContext.Tasks.Include(x => x.Assignee).AsQueryable();
 
-        if (tasksSearch.Name!.IsNotWhiteSpaceAndNull())
+        if (tasksSearch.Name.IsNotWhiteSpaceAndNull())
         {
-            qry = qry.Where(x => x.Name.Contains(tasksSearch.Name!));
+            qry = qry.Where(x => x.Name.Contains(tasksSearch.Name));
         }
 
         if (tasksSearch.AssigneeId.HasValue)

@@ -7,5 +7,5 @@ public interface IAuthService
 {
     public ValueTask<LoginResponse?> Login(LoginRequest request);
 
-    public Task Logout();
+    public ValueTask Logout();
 }
