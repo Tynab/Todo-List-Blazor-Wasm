@@ -1,8 +1,9 @@
 ﻿using TodoListBlazorWasm.Models.Enums;
+using TodoListBlazorWasm.Models.SeedWork;
 
 namespace TodoListBlazorWasm.Models.Dtos;
 
-public sealed class TasksSearchDto
+public sealed class TasksSearchDto : PagingParameters
 {
     public string? Name { get; set; }
 

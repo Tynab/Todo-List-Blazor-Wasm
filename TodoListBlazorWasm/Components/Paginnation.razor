@@ -1,0 +1,68 @@
+﻿@using TodoListBlazorWasm.Features
+@using TodoListBlazorWasm.Models.SeedWork
+@using YANLib
+
+@if (_links.IsNotEmptyAndNull())
+{
+    <nav aria-label="Page navigation example">
+        <ul class="pagination justify-content-center">
+            @foreach (var link in _links)
+            {
+                <li @onclick="() => OnSelectedPage(link)" style="cursor:pointer" class="page-item @(link.Enabled ? null : "disabled") @(link.Active ? "active" : null)">
+                    <span class="page-link" href="#">@link.Text</span>
+                </li>
+            }
+        </ul>
+    </nav>
+}
+
+@code {
+    private List<PagingLink>? _links;
+
+
+    protected override void OnParametersSet() => CreatePaginationLinks();
+
+    private void CreatePaginationLinks()
+    {
+        if (MetaData is not null)
+        {
+            _links = new List<PagingLink>
+            {
+                new PagingLink(MetaData.CurrentPage - 1, MetaData.HasPrevious, "Previous")
+            };
+
+            for (var i = 1; i <= MetaData.TotalPages; i++)
+            {
+                if (i >= MetaData.CurrentPage - Spread && i <= MetaData.CurrentPage + Spread)
+                {
+                    _links.Add(new PagingLink(i, true, i.ToString()) { Active = MetaData.CurrentPage == i });
+                }
+            }
+
+            _links.Add(new PagingLink(MetaData.CurrentPage + 1, MetaData.HasNext, "Next"));
+        }
+    }
+
+    private async Task OnSelectedPage(PagingLink link)
+    {
+        if (MetaData is not null)
+        {
+            if ((link.Page == MetaData.CurrentPage || !link.Enabled))
+            {
+                return;
+            }
+
+            MetaData.CurrentPage = link.Page;
+            await SelectedPage.InvokeAsync(link.Page);
+        }
+    }
+
+    [Parameter]
+    public MetaData? MetaData { get; set; }
+
+    [Parameter]
+    public int Spread { get; set; }
+
+    [Parameter]
+    public EventCallback<int> SelectedPage { get; set; }
+}

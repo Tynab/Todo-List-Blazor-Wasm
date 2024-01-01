@@ -2,14 +2,10 @@
 
 @using Microsoft.AspNetCore.Authorization
 @using TodoListBlazorWasm.Components
-@using TodoListBlazorWasm.Models.Enums
 @using TodoListBlazorWasm.Services
 @using YANLib
-@using static System.Enum
 
 @inject IConfiguration Configuration
-@inject IToastService ToastService
-@inject IUserService UserService
 @inject ITaskService TaskService
 
 @attribute [Authorize]
@@ -17,58 +13,14 @@
 <PageTitle>Task list</PageTitle>
 <h1>Task list</h1>
 
-@if (Tasks.IsEmptyOrNull() || Assignees.IsEmptyOrNull())
+@if (Tasks.IsEmptyOrNull())
 {
     <LoadingIndicator />
 }
 else
 {
     <div class="text-center mt-4">
-        <EditForm Model="TasksSearch" OnSubmit="SearchForm">
-            <div class="d-flex justify-content-center">
-                <div class="w-75">
-                    <div class="row">
-                        <div class="col">
-                            <label>Name</label>
-                            <InputText class="form-control text-center" placeholder="Enter a name" @bind-Value="TasksSearch!.Name" />
-                        </div>
-
-                        <div class="col">
-                            <label>Assignee</label>
-
-                            <InputSelect class="form-control text-center" @bind-Value="TasksSearch.AssigneeId">
-                                <option>Select an asignee</option>
-
-                                @foreach (var asignee in Assignees)
-                                {
-                                    <option value="@asignee.Id">@($"{asignee.LastName} {asignee.FirstName}")</option>
-                                }
-                            </InputSelect>
-                        </div>
-
-                        <div class="col">
-                            <label>Priority</label>
-
-                            <InputSelect class="form-control text-center" @bind-Value="TasksSearch.Priority">
-                                <option>Select a priority</option>
-
-                                @foreach (var item in GetNames(typeof(Priority)))
-                                {
-                                    <option value="@item">@item</option>
-                                }
-                            </InputSelect>
-                        </div>
-                    </div>
-
-                    <div class="mt-3">
-                        <div>
-                            <button type="submit" class="btn btn-primary">Search</button>
-                            <a href="/task-create" class="btn btn-success">Create</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </EditForm>
+        <TaskSearch OnSearch="SearchTask" />
     </div>
 
     <table class="table align-middle text-center mt-4">
@@ -94,7 +46,7 @@ else
                         <PriorityLabel Priority="task.Priority" />
                     </td>
 
-                    <td>@(task.Assignee is null ? "N/A" : $"{task.Assignee.LastName} {task.Assignee.FirstName}")</td>
+                    <td><a style="cursor:pointer" @onclick="() => OpenAssignPopup(task.Id)">@(task.Assignee is null ? "N/A" : $"{task.Assignee.LastName} {task.Assignee.FirstName}")</a></td>
 
                     <td>
                         <StatusLabel Status="task.Status" />
@@ -106,9 +58,16 @@ else
                     <td>
                         <a href="/task-edit/@task.Id" class="btn btn-warning">Edit</a>
                         <a href="/task-detail/@task.Id" class="btn btn-secondary">Detail</a>
+                        <button class="btn btn-danger" @onclick="() => OnDeleteTask(task.Id)">Delete</button>
                     </td>
                 </tr>
             }
         </tbody>
+        <tfoot>
+            <Paginnation MetaData="MetaData" Spread="2" SelectedPage="SelectedPage"></Paginnation>
+        </tfoot>
     </table>
+
+    <Confirmation ConfirmationMessage="Are you sure to delete?" ConfirmationTitle="Delete Task" @ref="DeleteConfirmation" ConfirmationChanged="OnConfirmDeleteTask" />
+    <AssignTask @ref="AssignTaskDialog" CloseEventCallback="AssignTaskSuccess"></AssignTask>
 }

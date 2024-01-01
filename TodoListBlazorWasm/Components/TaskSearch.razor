@@ -1,0 +1,74 @@
+﻿@using TodoListBlazorWasm.Models.Dtos
+@using TodoListBlazorWasm.Models.Enums
+@using TodoListBlazorWasm.Models.Responses
+@using TodoListBlazorWasm.Services
+@using YANLib
+@using static System.Enum
+
+@inject IUserService UserService
+
+@if (Assignees.IsEmptyOrNull())
+{
+    <LoadingIndicator />
+}
+else
+{
+    <EditForm Model="TasksSearch" OnSubmit="SearchForm">
+        <div class="d-flex justify-content-center">
+            <div class="w-75">
+                <div class="row">
+                    <div class="col">
+                        <label>Name</label>
+                        <InputText class="form-control text-center" placeholder="Enter a name" @bind-Value="TasksSearch!.Name" />
+                    </div>
+
+                    <div class="col">
+                        <label>Assignee</label>
+
+                        <InputSelect class="form-control text-center" @bind-Value="TasksSearch.AssigneeId">
+                            <option>Select an asignee</option>
+
+                            @foreach (var asignee in Assignees)
+                            {
+                                <option value="@asignee.Id">@($"{asignee.LastName} {asignee.FirstName}")</option>
+                            }
+                        </InputSelect>
+                    </div>
+
+                    <div class="col">
+                        <label>Priority</label>
+
+                        <InputSelect class="form-control text-center" @bind-Value="TasksSearch.Priority">
+                            <option>Select a priority</option>
+
+                            @foreach (var item in GetNames(typeof(Priority)))
+                            {
+                                <option value="@item">@item</option>
+                            }
+                        </InputSelect>
+                    </div>
+                </div>
+
+                <div class="mt-3">
+                    <div>
+                        <button type="submit" class="btn btn-primary">Search</button>
+                        <a href="/task-create" class="btn btn-success">Create</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </EditForm>
+}
+
+@code {
+    protected override async Task OnInitializedAsync() => Assignees = await UserService.GetAll();
+
+    private async Task SearchForm(EditContext context) => await OnSearch.InvokeAsync(TasksSearch);
+
+    [Parameter]
+    public EventCallback<TasksSearchDto> OnSearch { get; set; }
+
+    private List<UserResponse>? Assignees { get; set; } = new List<UserResponse>();
+
+    private TasksSearchDto? TasksSearch { get; set; } = new TasksSearchDto();
+}

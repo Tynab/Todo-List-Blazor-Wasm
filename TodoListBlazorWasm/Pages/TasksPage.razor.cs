@@ -1,31 +1,82 @@
-﻿using Microsoft.AspNetCore.Components.Forms;
+﻿using Microsoft.AspNetCore.Components;
+using TodoListBlazorWasm.Components;
 using TodoListBlazorWasm.Models.Dtos;
 using TodoListBlazorWasm.Models.Responses;
-using static System.Threading.Tasks.Task;
+using TodoListBlazorWasm.Models.SeedWork;
+using TodoListBlazorWasm.Shared;
 
 namespace TodoListBlazorWasm.Pages;
 
 public sealed partial class TasksPage
 {
-    protected override async Task OnInitializedAsync()
-    {
-        var tasksTask = TaskService.GetAll().AsTask();
-        var assigneesTask = UserService.GetAll().AsTask();
+    protected override async Task OnInitializedAsync() => await GetTasks();
 
-        await WhenAll(tasksTask, assigneesTask);
-        Tasks = await tasksTask;
-        Assignees = await assigneesTask;
+    public async Task SearchTask(TasksSearchDto tasksSearch)
+    {
+        TasksSearch = tasksSearch;
+        await GetTasks();
     }
 
-    private async Task SearchForm(EditContext context)
+    public void OnDeleteTask(Guid deleteId)
     {
-        Tasks = await TaskService.Search(TasksSearch);
-        ToastService.ShowInfo("Seach completed");
+        DeleteId = deleteId;
+        DeleteConfirmation?.Show();
     }
+
+    public void OpenAssignPopup(Guid id) => AssignTaskDialog?.Show(id);
+
+    public async Task AssignTaskSuccess(bool result)
+    {
+        if (result)
+        {
+            await GetTasks();
+        }
+    }
+
+    public async Task OnConfirmDeleteTask(bool deleteConfirmed)
+    {
+        if (deleteConfirmed && await TaskService.Delete(DeleteId.ToString()))
+        {
+            await GetTasks();
+        }
+    }
+
+    private async Task GetTasks()
+    {
+        try
+        {
+            var pagingRes = await TaskService.Search(TasksSearch);
+
+            if (pagingRes is not null && pagingRes.MetaData is not null)
+            {
+                Tasks = pagingRes.Items;
+                MetaData = pagingRes.MetaData;
+            }
+        }
+        catch (Exception ex)
+        {
+            Error.ProcessError(ex);
+        }
+    }
+
+    private async Task SelectedPage(int page)
+    {
+        TasksSearch.PageNumber = page;
+        await GetTasks();
+    }
+
+    [CascadingParameter]
+    private Error Error { get; set; }
+
+    private Confirmation? DeleteConfirmation { get; set; }
+
+    private AssignTask? AssignTaskDialog { get; set; }
+
+    private Guid DeleteId { get; set; }
 
     private List<TaskResponse>? Tasks { get; set; }
 
-    private List<UserResponse>? Assignees { get; set; } = new List<UserResponse>();
+    private TasksSearchDto TasksSearch { get; set; } = new TasksSearchDto();
 
-    private TasksSearchDto? TasksSearch { get; set; } = new TasksSearchDto();
+    private MetaData MetaData { get; set; } = new MetaData();
 }

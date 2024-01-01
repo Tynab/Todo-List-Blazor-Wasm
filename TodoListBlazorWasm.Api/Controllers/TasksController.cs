@@ -4,6 +4,7 @@ using TodoListBlazorWasm.Api.Repositories;
 using TodoListBlazorWasm.Models.Dtos;
 using TodoListBlazorWasm.Models.Requests.Task;
 using TodoListBlazorWasm.Models.Responses;
+using TodoListBlazorWasm.Models.SeedWork;
 using YANLib;
 using static System.DateTime;
 using static TodoListBlazorWasm.Models.Enums.Status;
@@ -19,21 +20,26 @@ public sealed class TasksController : ControllerBase
     public TasksController(ITaskRepository repository) => _repository = repository;
 
     [HttpGet]
-    public async ValueTask<IActionResult> GetAll() => Ok((await _repository.GetAll()).Select(x => new TaskResponse
+    public async ValueTask<IActionResult> GetAll()
     {
-        Id = x.Id,
-        Name = x.Name,
-        Priority = x.Priority,
-        Status = x.Status,
-        CreatedAt = x.CreatedAt,
-        UpdatedAt = x.UpdatedAt,
-        Assignee = x.Assignee is null ? default : new UserResponse
+        var pageList = await _repository.GetAll();
+
+        return Ok(new PagedList<TaskResponse>(pageList.Items.Select(x => new TaskResponse
         {
-            Id = x.Assignee.Id,
-            FirstName = x.Assignee.FirstName,
-            LastName = x.Assignee.LastName,
-        }
-    }));
+            Id = x.Id,
+            Name = x.Name,
+            Priority = x.Priority,
+            Status = x.Status,
+            CreatedAt = x.CreatedAt,
+            UpdatedAt = x.UpdatedAt,
+            Assignee = x.Assignee is null ? default : new UserResponse
+            {
+                Id = x.Assignee.Id,
+                FirstName = x.Assignee.FirstName,
+                LastName = x.Assignee.LastName,
+            }
+        }).ToList(), pageList.MetaData.TotalCount, pageList.MetaData.CurrentPage, pageList.MetaData.PageSize));
+    }
 
     [HttpGet("{id}")]
     public async ValueTask<IActionResult> Get(Guid id)
@@ -58,21 +64,26 @@ public sealed class TasksController : ControllerBase
     }
 
     [HttpGet("search")]
-    public async ValueTask<IActionResult> Search([Required][FromQuery] TasksSearchDto tasksSearch) => Ok((await _repository.Search(tasksSearch)).Select(x => new TaskResponse
+    public async ValueTask<IActionResult> Search([Required][FromQuery] TasksSearchDto tasksSearch)
     {
-        Id = x.Id,
-        Name = x.Name,
-        Priority = x.Priority,
-        Status = x.Status,
-        CreatedAt = x.CreatedAt,
-        UpdatedAt = x.UpdatedAt,
-        Assignee = x.Assignee is null ? default : new UserResponse
+        var pageList = await _repository.Search(tasksSearch);
+
+        return Ok(new PagedList<TaskResponse>(pageList.Items.Select(x => new TaskResponse
         {
-            Id = x.Assignee.Id,
-            FirstName = x.Assignee.FirstName,
-            LastName = x.Assignee.LastName,
-        }
-    }));
+            Id = x.Id,
+            Name = x.Name,
+            Priority = x.Priority,
+            Status = x.Status,
+            CreatedAt = x.CreatedAt,
+            UpdatedAt = x.UpdatedAt,
+            Assignee = x.Assignee is null ? default : new UserResponse
+            {
+                Id = x.Assignee.Id,
+                FirstName = x.Assignee.FirstName,
+                LastName = x.Assignee.LastName,
+            }
+        }).ToList(), pageList.MetaData.TotalCount, pageList.MetaData.CurrentPage, pageList.MetaData.PageSize));
+    }
 
     [HttpPost]
     public async ValueTask<IActionResult> Create([Required] TaskCreateRequest request)

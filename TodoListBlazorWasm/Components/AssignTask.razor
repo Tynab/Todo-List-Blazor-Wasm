@@ -1,0 +1,93 @@
+﻿@using TodoListBlazorWasm.Models.Dtos
+@using TodoListBlazorWasm.Models.Requests.Task
+@using TodoListBlazorWasm.Models.Responses
+@using TodoListBlazorWasm.Services
+@using YANLib
+@using static System.Guid;
+
+@inject IToastService ToastService
+@inject IUserService UserService
+@inject ITaskService TaskService
+
+@if (ShowDialog && Assignees.IsNotEmptyAndNull())
+{
+    <div class="modal fade show d-block" id="assignModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <EditForm Model="TaskAssign" OnSubmit="HandleAssignSubmit">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Assign task to user</h5>
+                        <button class="btn-close" data-dismiss="modal" aria-label="Close" @onclick="() => Hide()" />
+                    </div>
+
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label for="recipient-name" class="col-form-label">Recipient:</label>
+
+                            <InputSelect class="form-control text-center" @bind-Value="TaskAssign.UserId">
+                                @foreach (var asignee in Assignees)
+                                {
+                                    <option value="@asignee.Id">@($"{asignee.LastName} {asignee.FirstName}")</option>
+                                }
+                            </InputSelect>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal" @onclick="() => Hide()">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Assign</button>
+                    </div>
+                </EditForm>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    protected override async Task OnInitializedAsync() => Assignees = await UserService.GetAll();
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (Id != Empty)
+        {
+            TaskAssign.UserId = (await TaskService.Get(Id.ToString()))?.Assignee?.Id;
+        }
+    }
+
+    protected async Task HandleAssignSubmit()
+    {
+        if (await TaskService.Update(Id.ToString(), new TaskUpdateRequest { AssigneeId = TaskAssign.UserId }))
+        {
+            ShowDialog = false;
+            await CloseEventCallback.InvokeAsync(true);
+        }
+        else
+        {
+            ToastService.ShowError("Assign task failed");
+        }
+    }
+
+    public void Show(Guid id)
+    {
+        ShowDialog = true;
+        Id = id;
+        StateHasChanged();
+    }
+
+    private void Hide()
+    {
+        ShowDialog = false;
+        StateHasChanged();
+    }
+
+    [Parameter]
+    public EventCallback<bool> CloseEventCallback { get; set; }
+
+    protected bool ShowDialog { get; set; }
+
+    private Guid Id { get; set; }
+
+    private AssignTaskDto TaskAssign { get; set; } = new AssignTaskDto();
+
+    private List<UserResponse>? Assignees { get; set; } = new List<UserResponse>();
+}

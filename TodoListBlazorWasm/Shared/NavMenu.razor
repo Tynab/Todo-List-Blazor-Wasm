@@ -31,8 +31,5 @@
 
     private string? NavMenuCssClass => collapseNavMenu ? "collapse" : default;
 
-    private void ToggleNavMenu()
-    {
-        collapseNavMenu = !collapseNavMenu;
-    }
+    private void ToggleNavMenu() => collapseNavMenu = !collapseNavMenu;
 }

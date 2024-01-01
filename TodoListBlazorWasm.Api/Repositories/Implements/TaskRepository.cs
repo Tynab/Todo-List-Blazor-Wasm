@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using TodoListBlazorWasm.Api.Data;
 using TodoListBlazorWasm.Models.Dtos;
+using TodoListBlazorWasm.Models.SeedWork;
 using YANLib;
 
 namespace TodoListBlazorWasm.Api.Repositories.Implements;
@@ -11,11 +12,22 @@ public sealed class TaskRepository : ITaskRepository
 
     public TaskRepository(TodoListDbContext dbContext) => _dbContext = dbContext;
 
-    public async ValueTask<IEnumerable<Entities.Task>> GetAll() => await _dbContext.Tasks.Include(x => x.Assignee).OrderByDescending(x => x.CreatedAt).AsNoTracking().ToArrayAsync();
+    public async ValueTask<PagedList<Entities.Task>> GetAll()
+    {
+        var pageNumber = 1;
+        var pageSize = 4;
+
+        return new PagedList<Entities.Task>(
+            await _dbContext.Tasks.Include(x => x.Assignee).OrderByDescending(x => x.CreatedAt).Skip((pageNumber - 1) * pageSize).Take(pageSize).AsNoTracking().ToListAsync(),
+            await _dbContext.Tasks.CountAsync(),
+            pageNumber,
+            pageSize
+        );
+    }
 
     public async ValueTask<Entities.Task?> Get(Guid id) => await _dbContext.Tasks.Include(x => x.Assignee).AsNoTracking().FirstOrDefaultAsync(x => x.Id == id);
 
-    public async ValueTask<IEnumerable<Entities.Task>> Search(TasksSearchDto tasksSearch)
+    public async ValueTask<PagedList<Entities.Task>> Search(TasksSearchDto tasksSearch)
     {
         var qry = _dbContext.Tasks.Include(x => x.Assignee).AsQueryable();
 
@@ -34,7 +46,12 @@ public sealed class TaskRepository : ITaskRepository
             qry = qry.Where(x => x.Priority == tasksSearch.Priority.Value);
         }
 
-        return await qry.OrderByDescending(x => x.CreatedAt).AsNoTracking().ToArrayAsync();
+        return new PagedList<Entities.Task>(
+            await qry.OrderByDescending(x => x.CreatedAt).Skip((tasksSearch.PageNumber - 1) * tasksSearch.PageSize).Take(tasksSearch.PageSize).AsNoTracking().ToListAsync(),
+            await qry.CountAsync(),
+            tasksSearch.PageNumber,
+            tasksSearch.PageSize
+        );
     }
 
     public async ValueTask<Entities.Task?> Create(Entities.Task task)
