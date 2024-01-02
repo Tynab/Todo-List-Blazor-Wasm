@@ -55,7 +55,7 @@ public sealed partial class TasksPage
         }
         catch (Exception ex)
         {
-            Error.ProcessError(ex);
+            Error?.ProcessError(ex);
         }
     }
 
@@ -66,7 +66,7 @@ public sealed partial class TasksPage
     }
 
     [CascadingParameter]
-    private Error Error { get; set; }
+    private Error? Error { get; set; }
 
     private Confirmation? DeleteConfirmation { get; set; }
 
