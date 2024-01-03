@@ -9,35 +9,83 @@ namespace TodoListBlazorWasm.Pages;
 
 public sealed partial class TasksPage
 {
-    protected override async Task OnInitializedAsync() => await GetTasks();
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            await GetTasks();
+        }
+        catch (Exception ex)
+        {
+            Error?.ProcessError(ex);
+        }
+    }
 
     public async Task SearchTask(TasksSearchDto tasksSearch)
     {
-        TasksSearch = tasksSearch;
-        await GetTasks();
+        try
+        {
+            TasksSearch = tasksSearch;
+            await GetTasks();
+        }
+        catch (Exception ex)
+        {
+            Error?.ProcessError(ex);
+        }
     }
 
     public void OnDeleteTask(Guid deleteId)
     {
-        DeleteId = deleteId;
-        DeleteConfirmation?.Show();
+        try
+        {
+            DeleteId = deleteId;
+            DeleteConfirmation?.Show();
+        }
+        catch (Exception ex)
+        {
+            Error?.ProcessError(ex);
+        }
     }
 
-    public void OpenAssignPopup(Guid id) => AssignTaskDialog?.Show(id);
+    public void OpenAssignPopup(Guid id)
+    {
+        try
+        {
+            AssignTaskDialog?.Show(id);
+        }
+        catch (Exception ex)
+        {
+            Error?.ProcessError(ex);
+        }
+    }
 
     public async Task AssignTaskSuccess(bool result)
     {
-        if (result)
+        try
         {
-            await GetTasks();
+            if (result)
+            {
+                await GetTasks();
+            }
+        }
+        catch (Exception ex)
+        {
+            Error?.ProcessError(ex);
         }
     }
 
     public async Task OnConfirmDeleteTask(bool deleteConfirmed)
     {
-        if (deleteConfirmed && await TaskService.Delete(DeleteId.ToString()))
+        try
         {
-            await GetTasks();
+            if (deleteConfirmed && await TaskService.Delete(DeleteId.ToString()))
+            {
+                await GetTasks();
+            }
+        }
+        catch (Exception ex)
+        {
+            Error?.ProcessError(ex);
         }
     }
 
@@ -61,8 +109,15 @@ public sealed partial class TasksPage
 
     private async Task SelectedPage(int page)
     {
-        TasksSearch.PageNumber = page;
-        await GetTasks();
+        try
+        {
+            TasksSearch.PageNumber = page;
+            await GetTasks();
+        }
+        catch (Exception ex)
+        {
+            Error?.ProcessError(ex);
+        }
     }
 
     [CascadingParameter]
