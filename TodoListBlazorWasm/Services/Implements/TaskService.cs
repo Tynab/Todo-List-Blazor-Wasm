@@ -15,7 +15,7 @@ public sealed class TaskService : ITaskService
 
     public TaskService(HttpClient httpClient) => _httpClient = httpClient;
 
-    public async ValueTask<PagedList<TaskResponse>?> GetAll() => await _httpClient.GetFromJsonAsync<PagedList<TaskResponse>>("api/tasks");
+    public async ValueTask<List<TaskResponse>?> GetAll() => await _httpClient.GetFromJsonAsync<List<TaskResponse>>("api/tasks");
 
     public async ValueTask<TaskResponse?> Get(string? id) => id.IsWhiteSpaceOrNull() ? default : await _httpClient.GetFromJsonAsync<TaskResponse>($"api/tasks/{id}");
 

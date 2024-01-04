@@ -5,7 +5,7 @@ namespace TodoListBlazorWasm.Api.Repositories;
 
 public interface ITaskRepository
 {
-    public ValueTask<PagedList<Entities.Task>> GetAll();
+    public ValueTask<IEnumerable<Entities.Task>> GetAll();
 
     public ValueTask<Entities.Task?> Get(Guid id);
 

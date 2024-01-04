@@ -7,7 +7,7 @@ namespace TodoListBlazorWasm.Services;
 
 public interface ITaskService
 {
-    public ValueTask<PagedList<TaskResponse>?> GetAll();
+    public ValueTask<List<TaskResponse>?> GetAll();
 
     public ValueTask<TaskResponse?> Get(string? id);
 

@@ -21,7 +21,7 @@ public sealed partial class TasksPage
         }
     }
 
-    public async Task SearchTask(TasksSearchDto tasksSearch)
+    private async Task SearchTask(TasksSearchDto tasksSearch)
     {
         try
         {
@@ -34,7 +34,7 @@ public sealed partial class TasksPage
         }
     }
 
-    public void OnDeleteTask(Guid deleteId)
+    private void OnDeleteTask(Guid deleteId)
     {
         try
         {
@@ -47,7 +47,7 @@ public sealed partial class TasksPage
         }
     }
 
-    public void OpenAssignPopup(Guid id)
+    private void OpenAssignPopup(Guid id)
     {
         try
         {
@@ -59,7 +59,7 @@ public sealed partial class TasksPage
         }
     }
 
-    public async Task AssignTaskSuccess(bool result)
+    private async Task AssignTaskSuccess(bool result)
     {
         try
         {
@@ -74,7 +74,7 @@ public sealed partial class TasksPage
         }
     }
 
-    public async Task OnConfirmDeleteTask(bool deleteConfirmed)
+    private async Task OnConfirmDeleteTask(bool deleteConfirmed)
     {
         try
         {
@@ -89,7 +89,7 @@ public sealed partial class TasksPage
         }
     }
 
-    private async Task GetTasks()
+    private async ValueTask GetTasks()
     {
         try
         {

@@ -12,18 +12,7 @@ public sealed class TaskRepository : ITaskRepository
 
     public TaskRepository(TodoListDbContext dbContext) => _dbContext = dbContext;
 
-    public async ValueTask<PagedList<Entities.Task>> GetAll()
-    {
-        var pageNumber = 1;
-        var pageSize = 4;
-
-        return new PagedList<Entities.Task>(
-            await _dbContext.Tasks.Include(x => x.Assignee).OrderByDescending(x => x.CreatedAt).Skip((pageNumber - 1) * pageSize).Take(pageSize).AsNoTracking().ToListAsync(),
-            await _dbContext.Tasks.CountAsync(),
-            pageNumber,
-            pageSize
-        );
-    }
+    public async ValueTask<IEnumerable<Entities.Task>> GetAll() => await _dbContext.Tasks.Include(x => x.Assignee).OrderByDescending(x => x.CreatedAt).AsNoTracking().ToArrayAsync();
 
     public async ValueTask<Entities.Task?> Get(Guid id) => await _dbContext.Tasks.Include(x => x.Assignee).AsNoTracking().FirstOrDefaultAsync(x => x.Id == id);
 

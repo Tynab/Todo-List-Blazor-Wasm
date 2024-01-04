@@ -20,26 +20,21 @@ public sealed class TasksController : ControllerBase
     public TasksController(ITaskRepository repository) => _repository = repository;
 
     [HttpGet]
-    public async ValueTask<IActionResult> GetAll()
+    public async ValueTask<IActionResult> GetAll() => Ok((await _repository.GetAll()).Select(x => new TaskResponse
     {
-        var pageList = await _repository.GetAll();
-
-        return Ok(new PagedList<TaskResponse>(pageList.Items.Select(x => new TaskResponse
+        Id = x.Id,
+        Name = x.Name,
+        Priority = x.Priority,
+        Status = x.Status,
+        CreatedAt = x.CreatedAt,
+        UpdatedAt = x.UpdatedAt,
+        Assignee = x.Assignee is null ? default : new UserResponse
         {
-            Id = x.Id,
-            Name = x.Name,
-            Priority = x.Priority,
-            Status = x.Status,
-            CreatedAt = x.CreatedAt,
-            UpdatedAt = x.UpdatedAt,
-            Assignee = x.Assignee is null ? default : new UserResponse
-            {
-                Id = x.Assignee.Id,
-                FirstName = x.Assignee.FirstName,
-                LastName = x.Assignee.LastName,
-            }
-        }).ToList(), pageList.MetaData.TotalCount, pageList.MetaData.CurrentPage, pageList.MetaData.PageSize));
-    }
+            Id = x.Assignee.Id,
+            FirstName = x.Assignee.FirstName,
+            LastName = x.Assignee.LastName,
+        }
+    }));
 
     [HttpGet("{id}")]
     public async ValueTask<IActionResult> Get(Guid id)
@@ -68,7 +63,7 @@ public sealed class TasksController : ControllerBase
     {
         var pageList = await _repository.Search(tasksSearch);
 
-        return Ok(new PagedList<TaskResponse>(pageList.Items.Select(x => new TaskResponse
+        return Ok(new PagedList<TaskResponse>(pageList.Items?.Select(x => new TaskResponse
         {
             Id = x.Id,
             Name = x.Name,
@@ -82,7 +77,7 @@ public sealed class TasksController : ControllerBase
                 FirstName = x.Assignee.FirstName,
                 LastName = x.Assignee.LastName,
             }
-        }).ToList(), pageList.MetaData.TotalCount, pageList.MetaData.CurrentPage, pageList.MetaData.PageSize));
+        }).ToList(), pageList.MetaData?.TotalCount ?? 0, pageList.MetaData?.CurrentPage ?? 1, pageList.MetaData?.PageSize ?? 10));
     }
 
     [HttpPost]
