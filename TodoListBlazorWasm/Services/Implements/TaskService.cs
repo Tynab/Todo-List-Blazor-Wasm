@@ -82,7 +82,7 @@ public sealed class TaskService : ITaskService
 
             if (tasksSearch.Priority.HasValue)
             {
-                qryStrParam.Add(nameof(tasksSearch.PageNumber).ToLowerInvariant(), tasksSearch.Priority.Value.ToString());
+                qryStrParam.Add(nameof(tasksSearch.Priority).ToLowerInvariant(), tasksSearch.Priority.Value.ToString());
             }
 
             return await _httpClient.GetFromJsonAsync<PagedList<TaskResponse>>(AddQueryString("api/tasks/search", qryStrParam));
