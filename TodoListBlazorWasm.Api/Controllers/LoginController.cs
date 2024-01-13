@@ -15,8 +15,8 @@ using static System.Text.Encoding;
 
 namespace TodoListBlazorWasm.Api.Controllers;
 
-[Route("api/login")]
 [ApiController]
+[Route("api/login")]
 public sealed class LoginController : ControllerBase
 {
     private readonly IConfiguration _configuration;

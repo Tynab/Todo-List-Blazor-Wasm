@@ -10,8 +10,8 @@ using static System.Guid;
 
 namespace TodoListBlazorWasm.Api.Controllers;
 
-[Route("api/users")]
 [ApiController]
+[Route("api/users")]
 public sealed class UserController : ControllerBase
 {
     private readonly IUserRepository _repository;

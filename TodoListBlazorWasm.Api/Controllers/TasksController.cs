@@ -11,8 +11,8 @@ using static TodoListBlazorWasm.Models.Enums.Status;
 
 namespace TodoListBlazorWasm.Api.Controllers;
 
-[Route("api/tasks")]
 [ApiController]
+[Route("api/tasks")]
 public sealed class TasksController : ControllerBase
 {
     private readonly ITaskRepository _repository;
