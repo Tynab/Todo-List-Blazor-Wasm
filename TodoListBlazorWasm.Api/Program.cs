@@ -12,17 +12,17 @@ using TodoListBlazorWasm.Api.Repositories.Implements;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.ConfigureOptions<DatabaseOptionsSetup>();
-builder.Services.AddDbContext<TodoListDbContext>((p, o) => o.UseSqlServer(p.GetService<IOptions<DatabaseOptions>>()?.Value.ConnectionString));
-builder.Services.AddControllers();
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
-builder.Services.AddTransient<IUserRepository, UserRepository>();
-builder.Services.AddTransient<ITaskRepository, TaskRepository>();
-builder.Services.AddCors(o => o.AddPolicy("CorsPolicy", b => b.SetIsOriginAllowed((h) => true).AllowAnyMethod().AllowAnyHeader().AllowCredentials()));
-builder.Services.AddIdentity<User, Role>().AddEntityFrameworkStores<TodoListDbContext>();
+_ = builder.Services.ConfigureOptions<DatabaseOptionsSetup>();
+_ = builder.Services.AddDbContext<TodoListDbContext>((p, o) => o.UseSqlServer(p.GetService<IOptions<DatabaseOptions>>()?.Value.ConnectionString));
+_ = builder.Services.AddControllers();
+_ = builder.Services.AddEndpointsApiExplorer();
+_ = builder.Services.AddSwaggerGen();
+_ = builder.Services.AddTransient<IUserRepository, UserRepository>();
+_ = builder.Services.AddTransient<ITaskRepository, TaskRepository>();
+_ = builder.Services.AddCors(o => o.AddPolicy("CorsPolicy", b => b.SetIsOriginAllowed((h) => true).AllowAnyMethod().AllowAnyHeader().AllowCredentials()));
+_ = builder.Services.AddIdentity<User, Role>().AddEntityFrameworkStores<TodoListDbContext>();
 
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(o => o.TokenValidationParameters = new TokenValidationParameters
+_ = builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(o => o.TokenValidationParameters = new TokenValidationParameters
 {
     ValidateIssuer = true,
     ValidateAudience = true,
@@ -41,10 +41,10 @@ if (app.Environment.IsDevelopment())
     _ = app.UseSwaggerUI();
 }
 
-app.MigrateDbContext<TodoListDbContext>((c, s) => new TodoListDbContextSeed().SeedAsync(s.GetService<ILogger<TodoListDbContextSeed>>(), c).Wait());
-app.UseHttpsRedirection();
-app.UseCors("CorsPolicy");
-app.UseAuthentication();
-app.UseAuthorization();
-app.MapControllers();
+_ = app.MigrateDbContext<TodoListDbContext>((c, s) => new TodoListDbContextSeed().SeedAsync(s.GetService<ILogger<TodoListDbContextSeed>>(), c).Wait());
+_ = app.UseHttpsRedirection();
+_ = app.UseCors("CorsPolicy");
+_ = app.UseAuthentication();
+_ = app.UseAuthorization();
+_ = app.MapControllers();
 app.Run();

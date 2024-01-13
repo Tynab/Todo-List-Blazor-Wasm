@@ -11,17 +11,17 @@ var builder = WebAssemblyHostBuilder.CreateDefault(args);
 
 builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
-builder.Services.AddAuthorizationCore();
-builder.Services.AddTransient<IAuthService, AuthService>();
-builder.Services.AddTransient<IUserService, UserService>();
-builder.Services.AddTransient<ITaskService, TaskService>();
-builder.Services.AddScoped<AuthenticationStateProvider, ApiAuthenticationStateProvider>();
+_ = builder.Services.AddAuthorizationCore();
+_ = builder.Services.AddTransient<IAuthService, AuthService>();
+_ = builder.Services.AddTransient<IUserService, UserService>();
+_ = builder.Services.AddTransient<ITaskService, TaskService>();
+_ = builder.Services.AddScoped<AuthenticationStateProvider, ApiAuthenticationStateProvider>();
 
-builder.Services.AddScoped(s => new HttpClient
+_ = builder.Services.AddScoped(s => new HttpClient
 {
     BaseAddress = new Uri(builder.Configuration["BackendApiUrl"] ?? "https://localhost:7257/")
 });
 
-builder.Services.AddBlazoredLocalStorage();
-builder.Services.AddBlazoredToast();
+_ = builder.Services.AddBlazoredLocalStorage();
+_ = builder.Services.AddBlazoredToast();
 await builder.Build().RunAsync();
