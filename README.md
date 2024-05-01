@@ -1,2 +1,2 @@
-# Todo-List-Blazor-Wasm
+# TODO LIST BLAZOR WASM
  Blazor Wasm example.
